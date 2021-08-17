@@ -3,7 +3,7 @@ import { StyleSheet, Text, View, Button, TextInput } from "react-native";
 import { AuthContext } from "../contexts/AuthContext";
 import DefaultScreenProp from "../interfaces/navigation/DefaultScreenProp";
 import { gql, useMutation } from "@apollo/client";
-import { CREATE_SHOPPING_LIST } from "../graphql";
+import { CREATE_SHOPPING_LIST } from "../apollo/graphql";
 import { showToast } from "../components/Toast";
 import { DefaultInput } from "../components/Inputs";
 import { ShoppingListCreateInput } from "../interfaces/shoppingList";

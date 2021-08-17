@@ -4,7 +4,7 @@ import { AuthContext } from "../contexts/AuthContext";
 import DefaultScreenProp from "../interfaces/navigation/DefaultScreenProp";
 import { useMutation } from "@apollo/client";
 import { showToast } from "../components/Toast";
-import { REGISTER } from "../graphql";
+import { REGISTER } from "../apollo/graphql";
 import { DefaultInput } from "../components/Inputs";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { UserCreateInput } from "../interfaces/user";

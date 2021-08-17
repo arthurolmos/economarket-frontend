@@ -10,6 +10,13 @@ export const GET_SHOPPING_LISTS_BY_USER = gql`
         firstName
         lastName
       }
+      listProducts {
+        id
+        quantity
+        price
+      }
+      totalPrice @client
+      isOwner @client
     }
   }
 `;

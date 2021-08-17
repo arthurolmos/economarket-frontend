@@ -3,6 +3,8 @@ interface Product {
   name: string;
   price: number;
   quantity: number;
+  purchased: boolean;
+  shoppingList: string;
 }
 
 interface ShoppingList {
@@ -17,30 +19,40 @@ export const products: Product[] = [
     name: "Produto 1",
     price: 100,
     quantity: 1,
+    purchased: false,
+    shoppingList: "a",
   },
   {
     id: "000002",
     name: "Produto 2",
     price: 200,
     quantity: 2,
+    purchased: false,
+    shoppingList: "a",
   },
   {
     id: "000003",
     name: "Produto 3",
     price: 300,
     quantity: 3,
+    purchased: false,
+    shoppingList: "a",
   },
   {
     id: "000004",
     name: "Produto 4",
     price: 400,
     quantity: 4,
+    purchased: false,
+    shoppingList: "a",
   },
   {
     id: "000005",
     name: "Produto 5",
     price: 500,
     quantity: 5,
+    purchased: false,
+    shoppingList: "a",
   },
 ];
 

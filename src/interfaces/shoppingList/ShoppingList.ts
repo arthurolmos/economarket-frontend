@@ -10,4 +10,7 @@ export interface ShoppingList {
   user?: User;
   sharedUsers?: User[];
   listProducts?: ListProduct[];
+
+  isOwner?: boolean;
+  totalPrice?: number;
 }

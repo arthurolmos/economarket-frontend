@@ -8,7 +8,7 @@ import {
   GET_LIST_PRODUCT_BY_SHOPPING_LIST,
   GET_SHOPPING_LIST,
   UPDATE_LIST_PRODUCT,
-} from "../graphql";
+} from "../apollo/graphql";
 import { ListProductUpdateInput } from "../interfaces/listProduct";
 import ParamScreenProp from "../interfaces/navigation/ParamScreenProp";
 

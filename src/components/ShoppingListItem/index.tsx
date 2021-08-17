@@ -1,8 +1,15 @@
 import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, Button } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { ShoppingList } from "../../interfaces/shoppingList";
 import { AuthContext } from "../../contexts/AuthContext";
+import { useMutation } from "@apollo/client";
+import {
+  DELETE_SHOPPING_LIST,
+  GET_SHOPPING_LISTS_BY_USER,
+  LEAVE_SHARED_SHOPPING_LIST,
+} from "../../apollo/graphql";
+import { showToast } from "../Toast";
 
 interface Props {
   shoppingList: ShoppingList;
@@ -15,25 +22,88 @@ function ShoppingListItem(props: Props) {
 
   const navigation = useNavigation();
 
-  const owner = shoppingList?.user?.id === user?.id ? "OWNER" : "Shared";
+  const [doLeaveShoppingList, leavingShoppingList] = useMutation(
+    LEAVE_SHARED_SHOPPING_LIST,
+    {
+      refetchQueries: [
+        {
+          query: GET_SHOPPING_LISTS_BY_USER,
+          variables: { userId: user?.id },
+        },
+      ],
+    }
+  );
+
+  function leaveShoppingList() {
+    doLeaveShoppingList({
+      variables: { id: shoppingList.id, userId: user?.id },
+    })
+      .then(() => showToast("Saida com sucesso!"))
+      .catch((err) => console.log(err));
+  }
+
+  const [doDeleteShoppingList, deletingShoppinList] = useMutation(
+    DELETE_SHOPPING_LIST,
+    {
+      refetchQueries: [
+        {
+          query: GET_SHOPPING_LISTS_BY_USER,
+          variables: { userId: user?.id },
+        },
+      ],
+    }
+  );
+
+  function deleteShoppingList() {
+    doDeleteShoppingList({
+      variables: { id: shoppingList.id, userId: user?.id },
+    })
+      .then(() => showToast("Lista excluída com sucesso!"))
+      .catch((err) => console.log(err));
+  }
 
   return (
     <TouchableOpacity
-      style={styles.container}
       onPress={() =>
         navigation.navigate("ShoppingList", { id: shoppingList.id })
       }
     >
-      <View style={styles.left}>
-        <Text style={styles.title}>{shoppingList.name}</Text>
-        <Text>
-          Criado por{" "}
-          {`${shoppingList?.user?.firstName} ${shoppingList?.user?.lastName}`}
-        </Text>
-        <Text>{owner}</Text>
-      </View>
-      <View style={styles.right}>
-        <Text style={styles.price}>R$ 10,00</Text>
+      <View style={styles.container}>
+        <View style={{ display: "flex", flexDirection: "row" }}>
+          <View style={styles.left}>
+            <Text style={styles.title}>{shoppingList.name}</Text>
+            <Text>
+              Criado por{" "}
+              {`${shoppingList?.user?.firstName} ${shoppingList?.user?.lastName}`}
+            </Text>
+            <Text>{shoppingList.isOwner ? "OWNER" : "SHARED"}</Text>
+          </View>
+          <View style={styles.right}>
+            <Text style={styles.price}>
+              R$ {shoppingList.totalPrice?.toFixed(2)}
+            </Text>
+          </View>
+        </View>
+        <View
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "space-between",
+          }}
+        >
+          <Button title="Editar" onPress={() => console.log("EDIT!")} />
+          {shoppingList.isOwner ? (
+            deletingShoppinList.loading ? (
+              <Text>Loading...</Text>
+            ) : (
+              <Button title="Excluir" onPress={deleteShoppingList} />
+            )
+          ) : leavingShoppingList.loading ? (
+            <Text>Loading...</Text>
+          ) : (
+            <Button title="Sair" onPress={leaveShoppingList} />
+          )}
+        </View>
       </View>
     </TouchableOpacity>
   );
@@ -44,7 +114,6 @@ export default ShoppingListItem;
 const styles = StyleSheet.create({
   container: {
     display: "flex",
-    flexDirection: "row",
     padding: 15,
     borderWidth: 1,
     borderColor: "purple",

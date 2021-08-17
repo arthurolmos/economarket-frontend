@@ -3,7 +3,7 @@ import { StyleSheet, Text, View, Button, TextInput } from "react-native";
 import { AuthContext } from "../contexts/AuthContext";
 import DefaultScreenProp from "../interfaces/navigation/DefaultScreenProp";
 import { useMutation } from "@apollo/client";
-import { LOGIN } from "../graphql";
+import { LOGIN } from "../apollo/graphql";
 import { showToast } from "../components/Toast";
 import { DefaultInput } from "../components/Inputs";
 import { SafeAreaView } from "react-native-safe-area-context";

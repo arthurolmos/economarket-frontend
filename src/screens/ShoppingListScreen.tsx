@@ -11,13 +11,16 @@ import {
 } from "react-native";
 import { AuthContext } from "../contexts/AuthContext";
 import { gql, useMutation, useQuery } from "@apollo/client";
-import { GET_SHOPPING_LIST, SHARE_SHOPPING_LIST } from "../graphql";
+import {
+  GET_SHOPPING_LIST_BY_USER,
+  SHARE_SHOPPING_LIST,
+  CREATE_LIST_PRODUCT,
+} from "../apollo/graphql";
 import { showToast } from "../components/Toast";
 import { DefaultInput } from "../components/Inputs";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ParamScreenProp from "../interfaces/navigation/ParamScreenProp";
 import ListProductItem from "../components/ListProductItem";
-import { CREATE_LIST_PRODUCT } from "../graphql/CREATE_LIST_PRODUCT";
 import { ShoppingList } from "../interfaces/shoppingList";
 import { ListProductUpdateInput } from "../interfaces/listProduct";
 import { DefaultSubtitle, DefaultTitle } from "../components/Text";
@@ -44,31 +47,29 @@ function ShoppingListScreen({
   const [productBrand, setProductBrand] = React.useState("");
   const [productMarket, setProductMarket] = React.useState("");
 
-  const { data, loading, error } = useQuery(GET_SHOPPING_LIST, {
-    variables: { id: shoppingListId },
+  const { data, loading, error } = useQuery(GET_SHOPPING_LIST_BY_USER, {
+    variables: { id: shoppingListId, userId: user?.id },
+    pollInterval: 500,
   });
 
-  const shoppingList: ShoppingList = data?.shoppingList;
+  const shoppingList: ShoppingList = data?.shoppingListByUser;
   const username = `${shoppingList?.user?.firstName} ${shoppingList?.user?.lastName}`;
   const sharedWith =
     shoppingList?.sharedUsers && shoppingList?.sharedUsers.length > 1
       ? `Compartilhado com ${shoppingList?.sharedUsers?.length} pessoas`
       : "";
-  const owner = shoppingList?.user?.id === user?.id;
-  const totalPrice: number | undefined = shoppingList?.listProducts?.reduce(
-    (accumulator, currentValue) => {
-      return accumulator + currentValue.quantity * currentValue.price;
-    },
-    0
-  );
+  const purchasedListItemsTotal = shoppingList?.listProducts?.filter(
+    (product) => product.purchased === true
+  ).length;
+  const listProductsTotal = shoppingList?.listProducts?.length;
 
   const [doCreateListProduct, createListProduct] = useMutation(
     CREATE_LIST_PRODUCT,
     {
       refetchQueries: [
         {
-          query: GET_SHOPPING_LIST,
-          variables: { id: shoppingListId },
+          query: GET_SHOPPING_LIST_BY_USER,
+          variables: { id: shoppingListId, userId: user?.id },
         },
       ],
     }
@@ -132,9 +133,14 @@ function ShoppingListScreen({
               <DefaultTitle>{shoppingList?.name}</DefaultTitle>
               <Text>Criada por {username}</Text>
               <Text>{sharedWith}</Text>
-              <Text>{owner ? "OWNER" : "Shared"}</Text>
-              {owner && <Button title="Share!" onPress={openShareModal} />}
-              <Text>Total: R$ {totalPrice}</Text>
+              <Text>{shoppingList?.isOwner ? "OWNER" : "Shared"}</Text>
+              {shoppingList?.isOwner && (
+                <Button title="Share!" onPress={openShareModal} />
+              )}
+              <Text>Total: R$ {shoppingList?.totalPrice?.toFixed(2)}</Text>
+              <Text>
+                Produtos: {purchasedListItemsTotal} / {listProductsTotal}
+              </Text>
             </View>
 
             <View style={styles.inputView}>
@@ -226,7 +232,9 @@ function ShoppingListScreen({
               const product = { ...item };
               return <ListProductItem product={product} />;
             }}
-            keyExtractor={(item) => item.id}
+            keyExtractor={(item) => {
+              return item.id;
+            }}
             ListHeaderComponentStyle={{
               display: "flex",
               flex: 1,
@@ -279,6 +287,8 @@ function ShoppingListScreen({
                   placeholder="Insira o email do usuário"
                   value={email}
                   onChangeText={setEmail}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
                 />
 
                 {sharingShoppingList.loading ? (

@@ -5,7 +5,7 @@ import ShoppingList from "../components/ShoppingListItem";
 import { useQuery } from "@apollo/client";
 import { FloatingButton } from "../components/Buttons/FloatingButton";
 import { AuthContext } from "../contexts/AuthContext";
-import { GET_SHOPPING_LISTS_BY_USER } from "../graphql";
+import { GET_SHOPPING_LISTS_BY_USER } from "../apollo/graphql";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 function MyListsScreen({ navigation }: DefaultScreenProp) {
@@ -15,15 +15,18 @@ function MyListsScreen({ navigation }: DefaultScreenProp) {
     GET_SHOPPING_LISTS_BY_USER,
     {
       variables: { userId: user?.id },
+      pollInterval: 500,
     }
   );
+
+  const shoppingLists = data?.shoppingListsByUser;
 
   return (
     <SafeAreaView style={styles.container}>
       <FlatList
         refreshing={loading}
         onRefresh={refetch}
-        data={data?.shoppingListsByUser}
+        data={shoppingLists}
         renderItem={({ item }) => {
           return <ShoppingList shoppingList={item} />;
         }}

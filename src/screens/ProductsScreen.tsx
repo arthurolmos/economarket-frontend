@@ -8,11 +8,11 @@ function ProductsScreen({ navigation }: DefaultScreenProp) {
   return (
     <View style={{ flex: 1, alignItems: "center", padding: 15 }}>
       <Text>Meus Produtos</Text>
-      <View>
+      {/* <View>
         {data.products.map((product) => {
           return <ProductItem key={product.id} product={product} />;
         })}
-      </View>
+      </View> */}
     </View>
   );
 }

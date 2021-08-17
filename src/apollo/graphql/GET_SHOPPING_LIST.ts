@@ -27,6 +27,8 @@ export const GET_SHOPPING_LIST = gql`
           id
         }
       }
+      totalPrice @client
+      isOwner @client
     }
   }
 `;
