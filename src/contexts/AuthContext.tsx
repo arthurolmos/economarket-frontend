@@ -1,3 +1,4 @@
+import { useMutation, useQuery, useSubscription } from "@apollo/client";
 import React from "react";
 import { User } from "../interfaces/user";
 import storage from "../storage";
@@ -26,15 +27,6 @@ export function AuthProvider({ children }: Props) {
     await storage.del("access_token");
     setUser(null);
   };
-
-  // React.useEffect(() => {
-  //   async function checkToken() {
-  //     const access_token = await storage.get("access_token");
-  //     return access_token ? signIn(access_token) : signOut();
-  //   }
-
-  //   checkToken();
-  // }, []);
 
   return (
     <AuthContext.Provider

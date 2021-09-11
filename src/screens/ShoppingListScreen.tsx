@@ -3,27 +3,36 @@ import {
   StyleSheet,
   Text,
   View,
-  Button,
-  TextInput,
   FlatList,
   TouchableOpacity,
-  Modal,
+  ActivityIndicator,
+  TextInput,
+  Keyboard,
 } from "react-native";
 import { AuthContext } from "../contexts/AuthContext";
-import { gql, useMutation, useQuery } from "@apollo/client";
+import { useMutation } from "@apollo/client";
 import {
   GET_SHOPPING_LIST_BY_USER,
-  SHARE_SHOPPING_LIST,
   CREATE_LIST_PRODUCT,
 } from "../apollo/graphql";
 import { showToast } from "../components/Toast";
 import { DefaultInput } from "../components/Inputs";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ParamScreenProp from "../interfaces/navigation/ParamScreenProp";
-import ListProductItem from "../components/ListProductItem";
+import {
+  ListHintProductListItem,
+  ListProductListItem,
+} from "../components/ListItems";
 import { ShoppingList } from "../interfaces/shoppingList";
-import { ListProductUpdateInput } from "../interfaces/listProduct";
+import { ListProduct, ListProductUpdateInput } from "../interfaces/listProduct";
 import { DefaultSubtitle, DefaultTitle } from "../components/Text";
+import { EmptyListComponent } from "../components/ListItems";
+import { ShareShoppingListModal } from "../components/Modals";
+import { Ionicons } from "@expo/vector-icons";
+import { getShoppingListByUser } from "../apollo/queries";
+import { Product } from "../interfaces/product";
+import { readProductsByUser } from "../apollo/queries/readProductsByUser";
+import { AddProductModal } from "../components/Modals/AddProductModal";
 
 function ShoppingListScreen({
   route,
@@ -39,18 +48,30 @@ function ShoppingListScreen({
   const [shareModalVisible, setShareModalVisible] = React.useState(false);
   const openShareModal = () => setShareModalVisible(true);
   const closeShareModal = () => setShareModalVisible(false);
-  const [email, setEmail] = React.useState("");
 
-  const [productName, setProductName] = React.useState("");
-  const [productQuantity, setProductQuantity] = React.useState("");
-  const [productPrice, setProductPrice] = React.useState("");
-  const [productBrand, setProductBrand] = React.useState("");
-  const [productMarket, setProductMarket] = React.useState("");
+  const [product, setProduct] = React.useState<Partial<Product> | null>(null);
+  const [addProductModalVisible, setAddProductModalVisible] =
+    React.useState(false);
+  const openAddProductModal = (product: Partial<Product>) => {
+    setProduct(product);
+    setAddProductModalVisible(true);
+  };
+  const closeAddProductModal = () => {
+    setProduct(null);
+    setAddProductModalVisible(false);
+  };
+  const [name, setName] = React.useState("");
+  const [quantity, setQuantity] = React.useState("");
+  const [price, setPrice] = React.useState("");
+  const [brand, setBrand] = React.useState("");
+  const [market, setMarket] = React.useState("");
 
-  const { data, loading, error } = useQuery(GET_SHOPPING_LIST_BY_USER, {
-    variables: { id: shoppingListId, userId: user?.id },
-    pollInterval: 500,
-  });
+  const [hints, setHints] = React.useState<Product[]>([]);
+  const clearHints = () => setHints([]);
+
+  const quantityInputRef = React.createRef<TextInput>();
+
+  const { data, loading } = getShoppingListByUser(user?.id, shoppingListId);
 
   const shoppingList: ShoppingList = data?.shoppingListByUser;
   const username = `${shoppingList?.user?.firstName} ${shoppingList?.user?.lastName}`;
@@ -63,114 +84,158 @@ function ShoppingListScreen({
   ).length;
   const listProductsTotal = shoppingList?.listProducts?.length;
 
-  const [doCreateListProduct, createListProduct] = useMutation(
-    CREATE_LIST_PRODUCT,
-    {
-      refetchQueries: [
-        {
-          query: GET_SHOPPING_LIST_BY_USER,
-          variables: { id: shoppingListId, userId: user?.id },
-        },
-      ],
+  const [doCreateListProduct, createListProduct] =
+    useMutation(CREATE_LIST_PRODUCT);
+
+  const clear = () => {
+    setName("");
+    setQuantity("");
+    setPrice("");
+    setBrand("");
+    setMarket("");
+  };
+
+  async function addProductToShoppingList() {
+    try {
+      if (!name || !quantity || !price)
+        throw new Error("Preencha todos os campos!");
+
+      const data: ListProductUpdateInput = {
+        name: name,
+        quantity: parseFloat(quantity),
+        price: parseFloat(price),
+        brand: brand,
+        market: market,
+        purchased: false,
+      };
+
+      await doCreateListProduct({
+        variables: { data, shoppingListId },
+      });
+
+      showToast("Produto inserido com sucesso!");
+      clear();
+    } catch (err) {
+      console.log(err.message);
+      showToast(err.message);
     }
-  );
-
-  function addProductToShoppingList() {
-    if (!productName || !productQuantity || !productPrice)
-      return showToast("Preencha todos os campos!");
-
-    const data: ListProductUpdateInput = {
-      name: productName,
-      quantity: parseFloat(productQuantity),
-      price: parseFloat(productPrice),
-      brand: productBrand,
-      market: productMarket,
-      purchased: false,
-    };
-
-    doCreateListProduct({
-      variables: { data, shoppingListId },
-    })
-      .then(() => {
-        showToast("Produto inserido com sucesso!");
-      })
-      .catch((err) => {
-        console.log(err.message);
-        showToast(err.message);
-      });
   }
 
-  const [doShareShoppingList, sharingShoppingList] =
-    useMutation(SHARE_SHOPPING_LIST);
+  const productsByUser = readProductsByUser(user?.id);
 
-  function shareShoppingList() {
-    const emails = email.split(";").map((email) => email.trim());
+  function getHints(text: string) {
+    if (text.length < 3) return clearHints();
 
-    doShareShoppingList({
-      variables: {
-        userId: user?.id,
-        id: shoppingListId,
-        sharedUsersEmail: emails,
-      },
-    })
-      .then(() => {
-        showToast("Lista compartilhada com sucesso!");
-      })
-      .catch((err) => {
-        console.log(err.message);
-        showToast(err.message);
+    if (productsByUser) {
+      const matches = productsByUser.filter((product) => {
+        return product.name.toLowerCase().includes(text.toLowerCase());
       });
+
+      setHints(matches);
+    }
   }
+
+  const fillProduct = (product: Partial<ListProduct>) => {
+    setName(product?.name ? product.name : "");
+    setBrand(product?.brand ? product.brand : "");
+    setMarket(product?.market ? product.market : "");
+    setPrice(product?.price ? product.price.toString() : "");
+
+    clearHints();
+    quantityInputRef?.current?.focus();
+  };
 
   return (
     <SafeAreaView style={styles.container}>
       {loading ? (
-        <Text>Loading...</Text>
+        <ActivityIndicator size="large" color="green" />
       ) : (
         <>
           <View>
             <View style={styles.header}>
-              <DefaultTitle>{shoppingList?.name}</DefaultTitle>
-              <Text>Criada por {username}</Text>
-              <Text>{sharedWith}</Text>
-              <Text>{shoppingList?.isOwner ? "OWNER" : "Shared"}</Text>
-              {shoppingList?.isOwner && (
-                <Button title="Share!" onPress={openShareModal} />
-              )}
-              <Text>Total: R$ {shoppingList?.totalPrice?.toFixed(2)}</Text>
-              <Text>
-                Produtos: {purchasedListItemsTotal} / {listProductsTotal}
-              </Text>
+              <View style={{ display: "flex", flexDirection: "row" }}>
+                <View style={{ display: "flex", flex: 1 }}>
+                  <DefaultTitle>{shoppingList?.name}</DefaultTitle>
+                  <Text>Criada por {username}</Text>
+                </View>
+
+                {shoppingList?.isOwner && (
+                  <TouchableOpacity style={styles.shareButton}>
+                    <Ionicons
+                      name="share-social"
+                      size={32}
+                      color="gray"
+                      onPress={openShareModal}
+                    />
+                  </TouchableOpacity>
+                )}
+              </View>
+
+              <View style={{ display: "flex" }}>
+                <Text>{sharedWith}</Text>
+                <Text>TOTAL: R$ {shoppingList?.totalPrice?.toFixed(2)}</Text>
+                <Text>
+                  Produtos: {purchasedListItemsTotal} / {listProductsTotal}
+                </Text>
+              </View>
             </View>
 
-            <View style={styles.inputView}>
+            <View style={styles.inputContainer}>
               <DefaultSubtitle>Adicionar Produtos</DefaultSubtitle>
 
               <DefaultInput
-                value={productName}
-                onChangeText={setProductName}
+                value={name}
+                onChangeText={(text) => {
+                  setName(text);
+                  getHints(text);
+                }}
                 placeholder="Nome"
               />
-              <View
-                style={{
-                  display: "flex",
-                  flexDirection: "row",
-                  justifyContent: "space-between",
-                }}
-              >
-                <View style={{ display: "flex", flex: 1, marginRight: 10 }}>
-                  <DefaultInput
-                    placeholder="Quantidade"
-                    value={productQuantity}
-                    onChangeText={setProductQuantity}
-                    keyboardType="numeric"
+              {hints?.length > 0 && (
+                <View style={styles.hintContainer}>
+                  <View
+                    style={{
+                      display: "flex",
+                      alignItems: "flex-end",
+                    }}
+                  >
+                    <TouchableOpacity onPress={clearHints}>
+                      <Ionicons name="close" size={20} />
+                    </TouchableOpacity>
+                  </View>
+                  <FlatList
+                    data={hints}
+                    renderItem={({ item }) => {
+                      return (
+                        <ListHintProductListItem
+                          product={item}
+                          action={fillProduct}
+                        />
+                      );
+                    }}
+                    keyExtractor={(item) => item.id}
+                    ItemSeparatorComponent={() => (
+                      <View style={styles.separator} />
+                    )}
                   />
                 </View>
-                <View style={{ display: "flex", flex: 1, marginLeft: 10 }}>
+              )}
+
+              <View style={styles.inputRow}>
+                <View style={styles.inputRight}>
                   <DefaultInput
-                    placeholder="Preço"
-                    value={productPrice}
-                    onChangeText={setProductPrice}
+                    placeholder="Quantidade"
+                    value={quantity}
+                    onChangeText={setQuantity}
+                    keyboardType="numeric"
+                    ref={quantityInputRef}
+                  />
+                </View>
+                <View style={styles.inputLeft}>
+                  <DefaultInput
+                    placeholder="Preço Unitário"
+                    value={price}
+                    onChangeText={setPrice}
                     keyboardType="numeric"
                   />
                 </View>
@@ -178,47 +243,41 @@ function ShoppingListScreen({
               {isOpen && (
                 <>
                   <DefaultInput
-                    value={productBrand}
-                    onChangeText={setProductBrand}
+                    value={brand}
+                    onChangeText={setBrand}
                     placeholder="Marca"
                   />
 
                   <DefaultInput
-                    value={productMarket}
-                    onChangeText={setProductMarket}
+                    value={market}
+                    onChangeText={setMarket}
                     placeholder="Mercado"
                   />
                 </>
               )}
-              <View
-                style={{
-                  display: "flex",
-                  flexDirection: "row",
-                  justifyContent: "space-between",
-                }}
-              >
-                <View style={{ display: "flex", flex: 1, marginRight: 10 }}>
+              <View style={styles.inputRow}>
+                <View style={styles.inputRight}>
                   <TouchableOpacity
                     onPress={toggle}
-                    style={{
-                      borderWidth: 1,
-                      display: "flex",
-                      justifyContent: "center",
-                      alignItems: "center",
-                      margin: 5,
-                      borderRadius: 15,
-                      height: 30,
-                    }}
+                    style={styles.toggleButton}
                   >
                     <Text>{isOpen ? "...Menos" : "Mais..."}</Text>
                   </TouchableOpacity>
                 </View>
 
-                <View style={{ display: "flex", flex: 1, marginRight: 10 }}>
+                <View style={styles.inputLeft}>
                   {createListProduct.loading ? (
-                    <Text>Loading...</Text>
+                    <ActivityIndicator size="small" color="green" />
                   ) : (
-                    <Button onPress={addProductToShoppingList} title="Add" />
+                    <TouchableOpacity
+                      onPress={() => {
+                        Keyboard.dismiss();
+                        addProductToShoppingList();
+                      }}
+                      style={styles.addButton}
+                    >
+                      <Text style={{ color: "lightgreen" }}>Add</Text>
+                    </TouchableOpacity>
                   )}
                 </View>
               </View>
@@ -230,75 +289,34 @@ function ShoppingListScreen({
             data={shoppingList?.listProducts}
             renderItem={({ item }) => {
               const product = { ...item };
-              return <ListProductItem product={product} />;
+
+              return (
+                <ListProductListItem
+                  product={product}
+                  openModal={openAddProductModal}
+                />
+              );
             }}
             keyExtractor={(item) => {
               return item.id;
             }}
-            ListHeaderComponentStyle={{
-              display: "flex",
-              flex: 1,
-              margin: 0,
-              padding: 5,
-              marginBottom: 20,
-              backgroundColor: "yellow",
-            }}
-            ListEmptyComponent={() => (
-              <View>
-                <Text>
-                  {loading ? "Carregando" : "Lista vazia! Adicione produtos!"}
-                </Text>
-              </View>
-            )}
+            ListHeaderComponentStyle={styles.listHeader}
+            ListEmptyComponent={() => <EmptyListComponent loading={loading} />}
             ItemSeparatorComponent={() => <View style={styles.separator} />}
           />
 
-          <Modal visible={shareModalVisible} transparent={true}>
-            <View
-              style={{
-                display: "flex",
-                flex: 1,
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-            >
-              <View
-                style={{
-                  position: "absolute",
-                  top: 0,
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  backgroundColor: "black",
-                  opacity: 0.6,
-                }}
-              />
-              <View
-                style={{
-                  display: "flex",
-                  padding: 15,
-                  justifyContent: "center",
-                  alignItems: "center",
-                  backgroundColor: "white",
-                }}
-              >
-                <Button title="Close!" onPress={closeShareModal} />
-                <DefaultInput
-                  placeholder="Insira o email do usuário"
-                  value={email}
-                  onChangeText={setEmail}
-                  keyboardType="email-address"
-                  autoCapitalize="none"
-                />
+          <ShareShoppingListModal
+            isOpen={shareModalVisible}
+            close={closeShareModal}
+            userId={user?.id ? user.id : ""}
+            shoppingListId={shoppingList?.id ? shoppingList.id : ""}
+          />
 
-                {sharingShoppingList.loading ? (
-                  <Text>Loading...</Text>
-                ) : (
-                  <Button title="Share!" onPress={shareShoppingList} />
-                )}
-              </View>
-            </View>
-          </Modal>
+          <AddProductModal
+            isOpen={addProductModalVisible}
+            close={closeAddProductModal}
+            product={product}
+          />
         </>
       )}
     </SafeAreaView>
@@ -318,11 +336,77 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   separator: {
-    height: 10,
+    height: 1,
+    borderColor: "black",
+    borderWidth: 0.5,
   },
-  inputView: {
+  inputContainer: {
     display: "flex",
+    minHeight: 220,
     overflow: "hidden",
     marginBottom: 40,
+  },
+  inputRow: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  toggleButton: {
+    borderWidth: 1,
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    margin: 5,
+    borderRadius: 15,
+    height: 30,
+  },
+  addButton: {
+    borderWidth: 1,
+    borderColor: "lightgreen",
+    backgroundColor: "green",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    margin: 5,
+    borderRadius: 15,
+    height: 30,
+  },
+  inputRight: {
+    display: "flex",
+    flex: 1,
+    marginRight: 10,
+    justifyContent: "center",
+  },
+  inputLeft: {
+    display: "flex",
+    flex: 1,
+    marginLeft: 10,
+    justifyContent: "center",
+  },
+  listHeader: {
+    display: "flex",
+    flex: 1,
+    margin: 0,
+    padding: 5,
+    marginBottom: 20,
+  },
+  shareButton: {
+    display: "flex",
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "flex-end",
+    padding: 15,
+  },
+  hintContainer: {
+    display: "flex",
+    height: 140,
+    overflow: "hidden",
+    position: "absolute",
+    top: 80,
+    left: 0,
+    right: 0,
+    zIndex: 1,
+    backgroundColor: "lightblue",
+    padding: 5,
   },
 });

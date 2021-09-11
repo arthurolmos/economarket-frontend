@@ -8,6 +8,7 @@ export interface ListProduct {
   brand?: string;
   market?: string;
   purchased: boolean;
+  fav: boolean;
 
   productId?: string;
   shoppingList: ShoppingList;

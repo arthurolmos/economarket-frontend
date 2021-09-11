@@ -15,7 +15,7 @@ interface Props {
   shoppingList: ShoppingList;
 }
 
-function ShoppingListItem(props: Props) {
+export function ShoppingListItem(props: Props) {
   const { user } = React.useContext(AuthContext);
 
   const { shoppingList } = props;
@@ -108,8 +108,6 @@ function ShoppingListItem(props: Props) {
     </TouchableOpacity>
   );
 }
-
-export default ShoppingListItem;
 
 const styles = StyleSheet.create({
   container: {

@@ -1,3 +1,4 @@
+import { Expo } from "../expo";
 import { ShoppingList } from "../shoppingList";
 
 export interface User {
@@ -8,4 +9,6 @@ export interface User {
   password?: string;
 
   shoppingLists?: ShoppingList[];
+
+  notifications?: any[];
 }

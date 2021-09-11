@@ -1,6 +1,12 @@
 import { useMutation, useQuery } from "@apollo/client";
 import React from "react";
-import { Button, StyleSheet, Text, View } from "react-native";
+import {
+  ActivityIndicator,
+  Button,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { DefaultInput } from "../components/Inputs";
 import { showToast } from "../components/Toast";
@@ -11,6 +17,7 @@ import {
 } from "../apollo/graphql";
 import { ListProductUpdateInput } from "../interfaces/listProduct";
 import ParamScreenProp from "../interfaces/navigation/ParamScreenProp";
+import DefaultButton from "../components/Buttons/DefaultButton";
 
 function EditListProductScreen({
   navigation,
@@ -21,7 +28,7 @@ function EditListProductScreen({
     ? route.params?.shoppingListId
     : "";
 
-  const { loading, error, data } = useQuery(GET_LIST_PRODUCT_BY_SHOPPING_LIST, {
+  const { loading, data } = useQuery(GET_LIST_PRODUCT_BY_SHOPPING_LIST, {
     variables: { id, shoppingListId },
   });
 
@@ -52,42 +59,39 @@ function EditListProductScreen({
     ],
   });
 
-  function updateListProduct() {
-    const values: ListProductUpdateInput = {
-      name: productName,
-      quantity: parseFloat(productQuantity),
-      price: parseFloat(productPrice),
-      brand: productBrand,
-      market: productMarket,
-      purchased: true,
-    };
+  async function updateListProduct() {
+    try {
+      const values: ListProductUpdateInput = {
+        name: productName,
+        quantity: parseFloat(productQuantity),
+        price: parseFloat(productPrice),
+        brand: productBrand,
+        market: productMarket,
+        purchased: true,
+      };
 
-    doUpdateListProduct({
-      variables: {
-        id: product.id,
-        shoppingListId: product.shoppingList.id,
-        values,
-      },
-    })
-      .then(() => {
-        showToast("Produto atualizado com sucesso!");
-      })
-      .catch((err) => {
-        console.log(err.message);
-        showToast(err.message);
+      await doUpdateListProduct({
+        variables: {
+          id: product.id,
+          shoppingListId: product.shoppingList.id,
+          values,
+        },
       });
+
+      showToast("Produto atualizado com sucesso!");
+      navigation.goBack();
+    } catch (err) {
+      console.log(err.message);
+      showToast(err.message);
+    }
   }
 
   return (
     <SafeAreaView style={styles.container}>
       {loading ? (
-        <Text>Loading...</Text>
+        <ActivityIndicator size="large" color="green" />
       ) : (
         <>
-          <Button title="Edit" onPress={() => navigation.goBack()} />
-
-          <Text>IM EDITING</Text>
-
           <DefaultInput
             value={productName}
             onChangeText={setProductName}
@@ -100,7 +104,7 @@ function EditListProductScreen({
             keyboardType="numeric"
           />
           <DefaultInput
-            placeholder="Preço"
+            placeholder="Preço Unitário"
             value={productPrice}
             onChangeText={setProductPrice}
             keyboardType="numeric"
@@ -116,9 +120,14 @@ function EditListProductScreen({
             placeholder="Mercado"
           />
           {updating.loading ? (
-            <Text>Loading...</Text>
+            <ActivityIndicator size="large" color="green" />
           ) : (
-            <Button title="Save" onPress={updateListProduct} />
+            <DefaultButton
+              title="Atualizar"
+              action={updateListProduct}
+              color="green"
+              bgColor="lightgreen"
+            />
           )}
         </>
       )}
@@ -131,7 +140,6 @@ export default EditListProductScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
     padding: 15,
   },
 });

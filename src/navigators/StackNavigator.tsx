@@ -6,33 +6,41 @@ import RootStackParamList from "../interfaces/navigation/RootStackParamList";
 import LoginScreen from "../screens/LoginScreen";
 import RegisterScreen from "../screens/RegisterScreen";
 import TabNavigator from "./TabNavigator";
-import { Button, Text, View, TouchableOpacity } from "react-native";
 import CreateShoppingListScreen from "../screens/CreateShoppingListScreen";
 import ShoppingListScreen from "../screens/ShoppingListScreen";
 import EditListProductScreen from "../screens/EditListProdutScreen";
+import { NotificationButton } from "../components/Buttons";
+import NotificationsScreen from "../screens/NotificationsScreen";
+import * as Linking from "expo-linking";
+import { Text } from "react-native";
+import * as Constants from "expo-constants";
+import { navigationRef } from "./RootNavigation";
 
 const Stack = createStackNavigator<RootStackParamList>();
 
 function StackNavigator() {
   const { user } = React.useContext(AuthContext);
 
+  const linking = {
+    prefixes: ["exp://192.168.15.5:19000/"],
+  };
+
+  console.log(linking);
+
   return (
-    <NavigationContainer>
+    <NavigationContainer ref={navigationRef}>
       <Stack.Navigator
         initialRouteName="Home"
-        screenOptions={{
+        screenOptions={({ navigation }) => ({
           headerRight: () => (
-            <TouchableOpacity
-              style={{ marginRight: 25 }}
-              onPress={() => console.log("NOTIFY")}
-            >
-              <Text>Notify</Text>
-            </TouchableOpacity>
+            <NotificationButton
+              action={() => navigation.navigate("Notifications")}
+            />
           ),
           headerRightContainerStyle: {
-            marginRight: 15,
+            marginRight: 20,
           },
-        }}
+        })}
       >
         {!user ? (
           <>
@@ -57,11 +65,22 @@ function StackNavigator() {
             <Stack.Screen
               name="CreateShoppingList"
               component={CreateShoppingListScreen}
+              options={{ title: "Create Shopping List" }}
             />
-            <Stack.Screen name="ShoppingList" component={ShoppingListScreen} />
+            <Stack.Screen
+              name="ShoppingList"
+              component={ShoppingListScreen}
+              options={{ title: "Shopping List" }}
+            />
             <Stack.Screen
               name="EditListProduct"
               component={EditListProductScreen}
+              options={{ title: "Edit List Product" }}
+            />
+            <Stack.Screen
+              name="Notifications"
+              component={NotificationsScreen}
+              options={{ title: "Notifications" }}
             />
           </>
         )}

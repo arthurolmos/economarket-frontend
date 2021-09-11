@@ -1,5 +1,13 @@
 import React from "react";
-import { StyleSheet, Text, View, Button, TextInput } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  Button,
+  TextInput,
+  ActivityIndicator,
+  TouchableOpacity,
+} from "react-native";
 import { AuthContext } from "../contexts/AuthContext";
 import DefaultScreenProp from "../interfaces/navigation/DefaultScreenProp";
 import { useMutation } from "@apollo/client";
@@ -8,6 +16,7 @@ import { REGISTER } from "../apollo/graphql";
 import { DefaultInput } from "../components/Inputs";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { UserCreateInput } from "../interfaces/user";
+import DefaultButton from "../components/Buttons/DefaultButton";
 
 function RegisterScreen({ navigation }: DefaultScreenProp) {
   const { signIn } = React.useContext(AuthContext);
@@ -17,29 +26,37 @@ function RegisterScreen({ navigation }: DefaultScreenProp) {
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
 
-  const [doRegister, { data, loading, error }] = useMutation(REGISTER, {
+  const [doRegister, { loading }] = useMutation(REGISTER, {
     fetchPolicy: "no-cache",
   });
 
   async function register() {
-    if (email === "") return;
+    try {
+      if (
+        firstName === "" ||
+        lastName === "" ||
+        email === "" ||
+        password === ""
+      )
+        throw new Error("Preencha todos os campos!");
 
-    const data: UserCreateInput = {
-      firstName,
-      lastName,
-      email,
-      password,
-    };
+      const input: UserCreateInput = {
+        firstName,
+        lastName,
+        email,
+        password,
+      };
 
-    doRegister({ variables: { data } }).catch((err) => {
+      const { data } = await doRegister({ variables: { data: input } });
+
+      if (data) {
+        const { token, user } = data.register;
+        signIn(token, user);
+      }
+    } catch (err) {
       console.log(err.message);
       showToast(err.message);
-    });
-  }
-
-  if (data) {
-    const { token, user } = data.register;
-    signIn(token, user);
+    }
   }
 
   return (
@@ -69,25 +86,34 @@ function RegisterScreen({ navigation }: DefaultScreenProp) {
         onChangeText={setPassword}
         placeholder="Senha"
       />
-      <View
-        style={{
-          display: "flex",
-          flexDirection: "row",
-          justifyContent: "space-between",
-          width: "60%",
-          padding: 15,
-        }}
-      >
+      <View>
         {loading ? (
-          <Text>Loading...</Text>
+          <ActivityIndicator size="large" color="green" />
         ) : (
           <>
-            <Button title="Criar conta" onPress={() => register()} />
-            <Button
-              title="Login"
+            <View style={{ marginBottom: 15, marginTop: 15 }}>
+              <DefaultButton
+                title="Criar conta"
+                action={register}
+                color="white"
+                bgColor="lightgreen"
+              />
+            </View>
+
+            <TouchableOpacity
+              style={{
+                marginBottom: 15,
+                marginTop: 15,
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
               onPress={() => navigation.navigate("Login")}
-            />
-            <Button
+            >
+              <Text>Fazer login!</Text>
+            </TouchableOpacity>
+
+            {/* <Button
               title="Fill"
               onPress={() => {
                 setFirstName("James");
@@ -95,7 +121,7 @@ function RegisterScreen({ navigation }: DefaultScreenProp) {
                 setEmail(`jb${new Date()}@gmail.com`);
                 setPassword("123");
               }}
-            />
+            /> */}
           </>
         )}
       </View>

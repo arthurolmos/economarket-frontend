@@ -1,23 +1,17 @@
 import React from "react";
 import { StyleSheet, Text, View, Button, FlatList } from "react-native";
 import DefaultScreenProp from "../interfaces/navigation/DefaultScreenProp";
-import ShoppingList from "../components/ShoppingListItem";
-import { useQuery } from "@apollo/client";
+import { ShoppingListItem } from "../components/ListItems";
 import { FloatingButton } from "../components/Buttons/FloatingButton";
 import { AuthContext } from "../contexts/AuthContext";
-import { GET_SHOPPING_LISTS_BY_USER } from "../apollo/graphql";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { EmptyListComponent } from "../components/ListItems";
+import { getShoppingListsByUser } from "../apollo/queries";
 
 function MyListsScreen({ navigation }: DefaultScreenProp) {
   const { user } = React.useContext(AuthContext);
 
-  const { loading, error, data, refetch } = useQuery(
-    GET_SHOPPING_LISTS_BY_USER,
-    {
-      variables: { userId: user?.id },
-      pollInterval: 500,
-    }
-  );
+  const { loading, data, refetch } = getShoppingListsByUser(user?.id);
 
   const shoppingLists = data?.shoppingListsByUser;
 
@@ -28,14 +22,10 @@ function MyListsScreen({ navigation }: DefaultScreenProp) {
         onRefresh={refetch}
         data={shoppingLists}
         renderItem={({ item }) => {
-          return <ShoppingList shoppingList={item} />;
+          return <ShoppingListItem shoppingList={item} />;
         }}
         keyExtractor={(item) => item.id}
-        ListEmptyComponent={() => (
-          <View>
-            <Text>{loading ? "Carregando" : "Sem listas para exibir!"}</Text>
-          </View>
-        )}
+        ListEmptyComponent={() => <EmptyListComponent loading={loading} />}
         ItemSeparatorComponent={() => <View style={styles.separator} />}
       />
 

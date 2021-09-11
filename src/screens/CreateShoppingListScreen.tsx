@@ -1,8 +1,8 @@
 import React from "react";
-import { StyleSheet, Text, View, Button, TextInput } from "react-native";
+import { StyleSheet, View, Button, ActivityIndicator } from "react-native";
 import { AuthContext } from "../contexts/AuthContext";
 import DefaultScreenProp from "../interfaces/navigation/DefaultScreenProp";
-import { gql, useMutation } from "@apollo/client";
+import { useMutation } from "@apollo/client";
 import { CREATE_SHOPPING_LIST } from "../apollo/graphql";
 import { showToast } from "../components/Toast";
 import { DefaultInput } from "../components/Inputs";
@@ -18,42 +18,38 @@ function CreateShoppingListScreen({ navigation }: DefaultScreenProp) {
   });
 
   async function create() {
-    const data: ShoppingListCreateInput = {
-      name,
-      date: new Date(),
-    };
+    try {
+      const data: ShoppingListCreateInput = {
+        name,
+        date: new Date(),
+      };
 
-    doCreate({
-      variables: { userId: user?.id, data },
-    })
-      .then(() => {
-        navigation.goBack();
-        showToast("Criado com sucesso!");
-      })
-      .catch((err) => {
-        console.log(err.message);
-        showToast(err.message);
+      await doCreate({
+        variables: { userId: user?.id, data },
       });
+      showToast("Criado com sucesso!");
+      navigation.goBack();
+    } catch (err) {
+      console.log(err.message);
+      showToast(err.message);
+    }
   }
 
   return (
     <View style={styles.container}>
-      <Text style={{ textTransform: "uppercase", margin: 25, fontSize: 30 }}>
-        Criar Shopping List
-      </Text>
       <DefaultInput value={name} onChangeText={setName} placeholder="Name" />
 
       <View
         style={{
           display: "flex",
           justifyContent: "center",
-          width: "60%",
+          alignItems: "center",
           padding: 15,
         }}
       >
         <>
           {loading ? (
-            <Text>Loading...</Text>
+            <ActivityIndicator size="large" color="green" />
           ) : (
             <>
               <Button title="Salvar" onPress={() => create()} />
@@ -70,7 +66,6 @@ export default CreateShoppingListScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
     padding: 15,
   },
 });
