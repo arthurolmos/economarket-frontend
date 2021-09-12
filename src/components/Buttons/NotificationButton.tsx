@@ -42,8 +42,8 @@ const styles = StyleSheet.create({
 
   badge: {
     borderRadius: 50,
-    // height: 15,
-    // width: 15,
+    minWidth: 15,
+    minHeight: 15,
     padding: 2,
     display: "flex",
     justifyContent: "center",

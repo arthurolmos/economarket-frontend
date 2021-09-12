@@ -25,12 +25,12 @@ export function NotificationListItem(props: Props) {
   return (
     <View style={styles.container}>
       <Text>{notification.body}</Text>
-      <TouchableOpacity>
+      {/* <TouchableOpacity>
         <Ionicons name="create" size={32} color="gray" />
       </TouchableOpacity>
       <TouchableOpacity>
         <Ionicons name="create" size={32} color="gray" />
-      </TouchableOpacity>
+      </TouchableOpacity> */}
     </View>
   );
 }

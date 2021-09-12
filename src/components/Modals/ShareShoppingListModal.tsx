@@ -1,7 +1,10 @@
 import { useMutation } from "@apollo/client";
 import React from "react";
 import { Button, Modal, Text, View, StyleSheet } from "react-native";
-import { CREATE_SHARE_SHOPPING_LIST_NOTIFICATION } from "../../apollo/graphql";
+import {
+  CREATE_SHARE_SHOPPING_LIST_NOTIFICATION,
+  SHARE_SHOPPING_LIST,
+} from "../../apollo/graphql";
 import { AuthContext } from "../../contexts";
 import { NotificationsCreateInput } from "../../interfaces/notification";
 import { DefaultInput } from "../Inputs";
@@ -30,6 +33,7 @@ export function ShareShoppingListModal(props: Props) {
         variables: {
           userId,
           email,
+          shoppingListId: shoppingListId,
         },
       });
 
@@ -38,6 +42,33 @@ export function ShareShoppingListModal(props: Props) {
       close();
     } catch (err) {
       console.log(err);
+    }
+  }
+
+  const [doShareShoppingList, sharingShoppingList] =
+    useMutation(SHARE_SHOPPING_LIST);
+
+  async function shareShoppingList() {
+    try {
+      //TODO: melhorar validações e tela
+      if (userId === "" || shoppingListId === "")
+        throw new Error("Dados inválidos!");
+
+      if (email === "") throw new Error("Dados inválidos!");
+      const emails = email.split(";").map((email) => email.trim());
+
+      await doShareShoppingList({
+        variables: {
+          userId,
+          id: shoppingListId,
+          sharedUsersEmail: emails,
+        },
+      });
+
+      showToast("Lista compartilhada com sucesso!");
+    } catch (err) {
+      console.log(err);
+      showToast(err.message);
     }
   }
 
@@ -58,10 +89,14 @@ export function ShareShoppingListModal(props: Props) {
           {loading ? (
             <Text>Loading...</Text>
           ) : (
-            <Button
-              title="Share!"
-              onPress={createShareShoppingListNotification}
-            />
+            <>
+              <Button
+                title="Notify!"
+                onPress={createShareShoppingListNotification}
+              />
+
+              <Button title="Share!" onPress={shareShoppingList} />
+            </>
           )}
         </View>
       </View>

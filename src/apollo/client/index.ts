@@ -12,19 +12,23 @@ import { WebSocketLink } from "@apollo/client/link/ws";
 import { getMainDefinition } from "@apollo/client/utilities";
 
 const httpURI =
-  "http://" +
-  Constants.default.manifest?.debuggerHost
-    .split(`:`)
-    .shift()
-    .concat(`:3000/graphql`);
+  process.env.NODE_ENV === "development"
+    ? "http://" +
+      Constants.default.manifest?.debuggerHost
+        .split(`:`)
+        .shift()
+        .concat(`:3000/graphql`)
+    : "https://economarket.herokuapp.com/graphql";
 
 const wsURI =
-  "ws://" +
-  Constants.default.manifest?.debuggerHost
-    .split(`:`)
-    .shift()
-    .concat(`:3000/graphql`);
-// .concat(`:3000/subscriptions`);
+  process.env.NODE_ENV === "development"
+    ? "ws://" +
+      Constants.default.manifest?.debuggerHost
+        .split(`:`)
+        .shift()
+        .concat(`:3000/graphql`)
+    : // .concat(`:3000/subscriptions`);
+      "ws://economarket.herokuapp.com/graphql";
 
 console.log(httpURI);
 console.log(wsURI);

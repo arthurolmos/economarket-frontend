@@ -21,11 +21,11 @@ const Stack = createStackNavigator<RootStackParamList>();
 function StackNavigator() {
   const { user } = React.useContext(AuthContext);
 
-  const linking = {
-    prefixes: ["exp://192.168.15.5:19000/"],
-  };
+  // const linking = {
+  //   prefixes: ["exp://192.168.15.5:19000/"],
+  // };
 
-  console.log(linking);
+  // console.log(linking);
 
   return (
     <NavigationContainer ref={navigationRef}>
@@ -38,7 +38,7 @@ function StackNavigator() {
             />
           ),
           headerRightContainerStyle: {
-            marginRight: 20,
+            paddingRight: 20,
           },
         })}
       >
