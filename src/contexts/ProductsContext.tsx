@@ -1,6 +1,8 @@
 import React from "react";
 import { AuthContext } from "./AuthContext";
 import { getProductsByUser } from "../apollo/queries";
+import { useQuery } from "@apollo/client";
+import { GET_PRODUCTS_BY_USER } from "../apollo/graphql";
 
 interface Props {
   children: React.ReactElement;
@@ -8,6 +10,8 @@ interface Props {
 
 interface IContext {
   products: any[];
+  refetch: () => void;
+  loading: boolean;
   // addProduct: (product: any) => void;
   // removeProduct: (product: any) => void;
 }
@@ -31,13 +35,26 @@ export function ProductsProvider({ children }: Props) {
   //   setProducts(products.splice(index, 1));
   // };
 
-  const { data } = getProductsByUser(user?.id);
+  const { loading, data, refetch, startPolling, stopPolling } = useQuery(
+    GET_PRODUCTS_BY_USER,
+    {
+      variables: { userId: user?.id },
+    }
+  );
   const products = data?.productsByUser ? data?.productsByUser : [];
+
+  React.useEffect(() => {
+    startPolling(500);
+
+    return () => stopPolling();
+  }, []);
 
   return (
     <ProductsContext.Provider
       value={{
         products,
+        refetch,
+        loading,
         // addProduct,
         // removeProduct,
       }}

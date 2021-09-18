@@ -6,4 +6,5 @@ export interface Notification {
   body: string;
   read: boolean;
   user: User;
+  shoppingListId?: string;
 }

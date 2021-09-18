@@ -1,6 +1,6 @@
 import * as Notifications from "expo-notifications";
 
-export const getExpoPushToken = async () => {
+export const getToken = async () => {
   const token = (await Notifications.getExpoPushTokenAsync()).data;
 
   return token;

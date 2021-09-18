@@ -7,6 +7,7 @@ type RootStackParamList = {
   CreateShoppingList: undefined;
   ShoppingList: { id: string };
   EditListProduct: { id: string; shoppingListId: string };
+  EditProduct: { id: string };
   Notifications: undefined;
 };
 

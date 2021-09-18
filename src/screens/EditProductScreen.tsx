@@ -5,25 +5,27 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { DefaultInput } from "../components/Inputs";
 import { showToast } from "../components/Toast";
 import {
-  GET_LIST_PRODUCT_BY_SHOPPING_LIST,
-  GET_SHOPPING_LIST,
-  UPDATE_LIST_PRODUCT,
+  GET_PRODUCT,
+  GET_PRODUCTS_BY_USER,
+  UPDATE_PRODUCT,
 } from "../apollo/graphql";
 import { ListProductUpdateInput } from "../interfaces/listProduct";
 import ParamScreenProp from "../interfaces/navigation/ParamScreenProp";
 import DefaultButton from "../components/Buttons/DefaultButton";
+import { AuthContext } from "../contexts";
 
-function EditListProductScreen({
+function EditProductScreen({
   navigation,
   route,
-}: ParamScreenProp<"EditListProduct">) {
+}: ParamScreenProp<"EditProduct">) {
   const id = route.params.id;
-  const shoppingListId = route.params.shoppingListId;
 
-  const { loading, data, startPolling, stopPolling } = useQuery(
-    GET_LIST_PRODUCT_BY_SHOPPING_LIST,
+  const { user } = React.useContext(AuthContext);
+
+  const { loading, data, startPolling, stopPolling, error } = useQuery(
+    GET_PRODUCT,
     {
-      variables: { id, shoppingListId },
+      variables: { id },
     }
   );
 
@@ -33,10 +35,10 @@ function EditListProductScreen({
     return () => stopPolling();
   }, []);
 
-  const product = data?.listProductByShoppingList;
+  const product = data?.product;
+  if (error) console.log(error);
 
   const [productName, setProductName] = React.useState("");
-  const [productQuantity, setProductQuantity] = React.useState("");
   const [productPrice, setProductPrice] = React.useState("");
   const [productBrand, setProductBrand] = React.useState("");
   const [productMarket, setProductMarket] = React.useState("");
@@ -44,39 +46,33 @@ function EditListProductScreen({
   React.useEffect(() => {
     if (product) {
       setProductName(product.name);
-      setProductQuantity(product.quantity.toString());
       setProductPrice(product.price.toString());
       setProductBrand(product?.brand ? product?.brand : "");
       setProductMarket(product?.market ? product?.market : "");
     }
   }, [product]);
 
-  const [updateListProduct, updateListProductResult] = useMutation(
-    UPDATE_LIST_PRODUCT,
-    {
-      refetchQueries: [
-        {
-          query: GET_SHOPPING_LIST,
-          variables: { id: product?.shoppingList?.id },
-        },
-      ],
-    }
-  );
+  const [updateProduct, updateProductResult] = useMutation(UPDATE_PRODUCT, {
+    refetchQueries: [
+      {
+        query: GET_PRODUCTS_BY_USER,
+        variables: { userId: user?.id },
+      },
+    ],
+  });
 
   async function submit() {
     try {
       const values: ListProductUpdateInput = {
         name: productName,
-        quantity: parseFloat(productQuantity),
         price: parseFloat(productPrice),
         brand: productBrand,
         market: productMarket,
       };
 
-      await updateListProduct({
+      await updateProduct({
         variables: {
           id: product.id,
-          shoppingListId: product.shoppingList.id,
           values,
         },
       });
@@ -101,12 +97,6 @@ function EditListProductScreen({
             placeholder="Nome"
           />
           <DefaultInput
-            placeholder="Quantidade"
-            value={productQuantity}
-            onChangeText={setProductQuantity}
-            keyboardType="numeric"
-          />
-          <DefaultInput
             placeholder="Preço Unitário"
             value={productPrice}
             onChangeText={setProductPrice}
@@ -122,7 +112,7 @@ function EditListProductScreen({
             onChangeText={setProductMarket}
             placeholder="Mercado"
           />
-          {updateListProductResult.loading ? (
+          {updateProductResult.loading ? (
             <ActivityIndicator size="large" color="green" />
           ) : (
             <DefaultButton
@@ -138,7 +128,7 @@ function EditListProductScreen({
   );
 }
 
-export default EditListProductScreen;
+export default EditProductScreen;
 
 const styles = StyleSheet.create({
   container: {

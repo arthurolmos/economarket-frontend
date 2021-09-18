@@ -15,6 +15,7 @@ import * as Linking from "expo-linking";
 import { Text } from "react-native";
 import * as Constants from "expo-constants";
 import { navigationRef } from "./RootNavigation";
+import EditProductScreen from "../screens/EditProductScreen";
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -76,6 +77,11 @@ function StackNavigator() {
               name="EditListProduct"
               component={EditListProductScreen}
               options={{ title: "Edit List Product" }}
+            />
+            <Stack.Screen
+              name="EditProduct"
+              component={EditProductScreen}
+              options={{ title: "Edit Product" }}
             />
             <Stack.Screen
               name="Notifications"

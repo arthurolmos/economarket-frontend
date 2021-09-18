@@ -8,6 +8,7 @@ export const REGISTER = gql`
         id
         firstName
         lastName
+        fullName @client
       }
     }
   }

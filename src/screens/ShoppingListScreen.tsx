@@ -10,10 +10,12 @@ import {
   Keyboard,
 } from "react-native";
 import { AuthContext } from "../contexts/AuthContext";
-import { useMutation } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client";
 import {
   GET_SHOPPING_LIST_BY_USER,
   CREATE_LIST_PRODUCT,
+  READ_PRODUCTS_BY_USER,
+  GET_SHOPPING_LIST,
 } from "../apollo/graphql";
 import { showToast } from "../components/Toast";
 import { DefaultInput } from "../components/Inputs";
@@ -24,15 +26,15 @@ import {
   ListProductListItem,
 } from "../components/ListItems";
 import { ShoppingList } from "../interfaces/shoppingList";
-import { ListProduct, ListProductUpdateInput } from "../interfaces/listProduct";
+import { ListProduct, ListProductCreateInput } from "../interfaces/listProduct";
 import { DefaultSubtitle, DefaultTitle } from "../components/Text";
 import { EmptyListComponent } from "../components/ListItems";
 import { ShareShoppingListModal } from "../components/Modals";
 import { Ionicons } from "@expo/vector-icons";
-import { getShoppingListByUser } from "../apollo/queries";
 import { Product } from "../interfaces/product";
-import { readProductsByUser } from "../apollo/queries/readProductsByUser";
-import { AddProductModal } from "../components/Modals/AddProductModal";
+import { CreateProductModal } from "../components/Modals/CreateProductModal";
+import { validateListProduct } from "../lib/validations";
+import { client } from "../apollo/client";
 
 function ShoppingListScreen({
   route,
@@ -40,7 +42,7 @@ function ShoppingListScreen({
 }: ParamScreenProp<"ShoppingList">) {
   const { user } = React.useContext(AuthContext);
 
-  const shoppingListId = route.params?.id;
+  const shoppingListId = route.params.id;
 
   const [isOpen, setIsOpen] = React.useState(false);
   const toggle = () => setIsOpen(!isOpen);
@@ -49,15 +51,16 @@ function ShoppingListScreen({
   const openShareModal = () => setShareModalVisible(true);
   const closeShareModal = () => setShareModalVisible(false);
 
-  const [product, setProduct] = React.useState<Partial<Product> | null>(null);
+  const [modalProduct, setModalProduct] =
+    React.useState<Partial<Product> | null>(null);
   const [addProductModalVisible, setAddProductModalVisible] =
     React.useState(false);
   const openAddProductModal = (product: Partial<Product>) => {
-    setProduct(product);
+    setModalProduct(product);
     setAddProductModalVisible(true);
   };
   const closeAddProductModal = () => {
-    setProduct(null);
+    setModalProduct(null);
     setAddProductModalVisible(false);
   };
   const [name, setName] = React.useState("");
@@ -71,21 +74,30 @@ function ShoppingListScreen({
 
   const quantityInputRef = React.createRef<TextInput>();
 
-  const { data, loading } = getShoppingListByUser(user?.id, shoppingListId);
+  const { startPolling, stopPolling, ...getShoppingListResult } = useQuery(
+    GET_SHOPPING_LIST_BY_USER,
+    {
+      variables: { id: shoppingListId, userId: user?.id },
+    }
+  );
 
-  const shoppingList: ShoppingList = data?.shoppingListByUser;
+  React.useEffect(() => {
+    startPolling(500);
+
+    return () => stopPolling();
+  }, []);
+
+  const shoppingList: ShoppingList =
+    getShoppingListResult.data?.shoppingListByUser;
   const username = `${shoppingList?.user?.firstName} ${shoppingList?.user?.lastName}`;
-  const sharedWith =
-    shoppingList?.sharedUsers && shoppingList?.sharedUsers.length > 1
-      ? `Compartilhado com ${shoppingList?.sharedUsers?.length} pessoas`
-      : "";
+  // const sharedWith =
+  //   shoppingList?.sharedUsers && shoppingList?.sharedUsers.length > 1
+  //     ? `Compartilhado com ${shoppingList?.sharedUsers?.length} pessoas`
+  //     : "";
   const purchasedListItemsTotal = shoppingList?.listProducts?.filter(
     (product) => product.purchased === true
   ).length;
   const listProductsTotal = shoppingList?.listProducts?.length;
-
-  const [doCreateListProduct, createListProduct] =
-    useMutation(CREATE_LIST_PRODUCT);
 
   const clear = () => {
     setName("");
@@ -95,12 +107,12 @@ function ShoppingListScreen({
     setMarket("");
   };
 
+  const [createListProduct, createListProductResult] =
+    useMutation(CREATE_LIST_PRODUCT);
+
   async function addProductToShoppingList() {
     try {
-      if (!name || !quantity || !price)
-        throw new Error("Preencha todos os campos!");
-
-      const data: ListProductUpdateInput = {
+      const input: ListProductCreateInput = {
         name: name,
         quantity: parseFloat(quantity),
         price: parseFloat(price),
@@ -109,19 +121,30 @@ function ShoppingListScreen({
         purchased: false,
       };
 
-      await doCreateListProduct({
-        variables: { data, shoppingListId },
+      if (!validateListProduct(input))
+        throw new Error("Preencha todos os campos!");
+
+      await createListProduct({
+        variables: { data: input, shoppingListId },
       });
 
       showToast("Produto inserido com sucesso!");
       clear();
     } catch (err) {
-      console.log(err.message);
-      showToast(err.message);
+      console.log("Error on adding Product!", err);
+      showToast("Erro ao inserir Produto!");
     }
   }
 
-  const productsByUser = readProductsByUser(user?.id);
+  const readProductsByUser = client.readQuery<{
+    productsByUser: Product[];
+  }>({
+    query: READ_PRODUCTS_BY_USER,
+    variables: {
+      userId: user?.id,
+    },
+  });
+  const productsByUser = readProductsByUser?.productsByUser;
 
   function getHints(text: string) {
     if (text.length < 3) return clearHints();
@@ -147,7 +170,7 @@ function ShoppingListScreen({
 
   return (
     <SafeAreaView style={styles.container}>
-      {loading ? (
+      {getShoppingListResult.loading ? (
         <ActivityIndicator size="large" color="green" />
       ) : (
         <>
@@ -172,7 +195,7 @@ function ShoppingListScreen({
               </View>
 
               <View style={{ display: "flex" }}>
-                <Text>{sharedWith}</Text>
+                {/* <Text>{sharedWith}</Text> */}
                 <Text>TOTAL: R$ {shoppingList?.totalPrice?.toFixed(2)}</Text>
                 <Text>
                   Produtos: {purchasedListItemsTotal} / {listProductsTotal}
@@ -266,7 +289,7 @@ function ShoppingListScreen({
                 </View>
 
                 <View style={styles.inputLeft}>
-                  {createListProduct.loading ? (
+                  {createListProductResult.loading ? (
                     <ActivityIndicator size="small" color="green" />
                   ) : (
                     <TouchableOpacity
@@ -285,7 +308,7 @@ function ShoppingListScreen({
           </View>
 
           <FlatList
-            refreshing={loading}
+            refreshing={getShoppingListResult.loading}
             data={shoppingList?.listProducts}
             renderItem={({ item }) => {
               const product = { ...item };
@@ -301,21 +324,22 @@ function ShoppingListScreen({
               return item.id;
             }}
             ListHeaderComponentStyle={styles.listHeader}
-            ListEmptyComponent={() => <EmptyListComponent loading={loading} />}
+            ListEmptyComponent={() => (
+              <EmptyListComponent loading={getShoppingListResult.loading} />
+            )}
             ItemSeparatorComponent={() => <View style={styles.separator} />}
           />
 
           <ShareShoppingListModal
             isOpen={shareModalVisible}
             close={closeShareModal}
-            userId={user?.id ? user.id : ""}
             shoppingListId={shoppingList?.id ? shoppingList.id : ""}
           />
 
-          <AddProductModal
+          <CreateProductModal
             isOpen={addProductModalVisible}
             close={closeAddProductModal}
-            product={product}
+            product={modalProduct}
           />
         </>
       )}

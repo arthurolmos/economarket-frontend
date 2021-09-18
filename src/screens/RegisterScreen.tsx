@@ -3,8 +3,6 @@ import {
   StyleSheet,
   Text,
   View,
-  Button,
-  TextInput,
   ActivityIndicator,
   TouchableOpacity,
 } from "react-native";
@@ -17,6 +15,7 @@ import { DefaultInput } from "../components/Inputs";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { UserCreateInput } from "../interfaces/user";
 import DefaultButton from "../components/Buttons/DefaultButton";
+import { validateRegister } from "../lib/validations";
 
 function RegisterScreen({ navigation }: DefaultScreenProp) {
   const { signIn } = React.useContext(AuthContext);
@@ -26,20 +25,12 @@ function RegisterScreen({ navigation }: DefaultScreenProp) {
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
 
-  const [doRegister, { loading }] = useMutation(REGISTER, {
+  const [register, { loading }] = useMutation(REGISTER, {
     fetchPolicy: "no-cache",
   });
 
-  async function register() {
+  async function submit() {
     try {
-      if (
-        firstName === "" ||
-        lastName === "" ||
-        email === "" ||
-        password === ""
-      )
-        throw new Error("Preencha todos os campos!");
-
       const input: UserCreateInput = {
         firstName,
         lastName,
@@ -47,15 +38,17 @@ function RegisterScreen({ navigation }: DefaultScreenProp) {
         password,
       };
 
-      const { data } = await doRegister({ variables: { data: input } });
+      if (!validateRegister(input))
+        throw new Error("Preencha todos os campos!");
 
-      if (data) {
-        const { token, user } = data.register;
-        signIn(token, user);
-      }
+      const { data } = await register({ variables: { data: input } });
+
+      const { token, user } = data.register;
+
+      signIn(token, user);
     } catch (err) {
-      console.log(err.message);
-      showToast(err.message);
+      console.log("Error on Register!", err);
+      showToast("Erro ao se registrar!");
     }
   }
 
@@ -94,7 +87,7 @@ function RegisterScreen({ navigation }: DefaultScreenProp) {
             <View style={{ marginBottom: 15, marginTop: 15 }}>
               <DefaultButton
                 title="Criar conta"
-                action={register}
+                action={submit}
                 color="white"
                 bgColor="lightgreen"
               />
@@ -112,16 +105,6 @@ function RegisterScreen({ navigation }: DefaultScreenProp) {
             >
               <Text>Fazer login!</Text>
             </TouchableOpacity>
-
-            {/* <Button
-              title="Fill"
-              onPress={() => {
-                setFirstName("James");
-                setLastName("Bond");
-                setEmail(`jb${new Date()}@gmail.com`);
-                setPassword("123");
-              }}
-            /> */}
           </>
         )}
       </View>

@@ -18,8 +18,8 @@ import { ListProduct } from "../../interfaces/listProduct";
 import { showToast } from "../Toast";
 import { Swipeable } from "react-native-gesture-handler";
 import { Ionicons } from "@expo/vector-icons";
-import { AuthContext } from "../../contexts";
 import { Product } from "../../interfaces/product";
+import ScreenNavigationProp from "../../interfaces/navigation/ScreenNavigationProp";
 
 interface Props {
   product: ListProduct;
@@ -29,7 +29,7 @@ interface Props {
 export function ListProductListItem(props: Props) {
   const { product, openModal } = props;
 
-  const navigation = useNavigation();
+  const navigation = useNavigation<ScreenNavigationProp>();
 
   const totalPrice = product.price * product.quantity;
 
@@ -50,7 +50,7 @@ export function ListProductListItem(props: Props) {
 
       showToast("Produto removido com sucesso!");
     } catch (err) {
-      console.log(err.message);
+      console.log("Error on removing product", err);
       showToast(err.message);
     }
   }
@@ -71,9 +71,13 @@ export function ListProductListItem(props: Props) {
         },
       });
 
-      showToast("Produto comprado com sucesso!");
+      if (values.purchased) {
+        showToast("Produto comprado com sucesso!");
+      } else {
+        showToast("Produto retornado com sucesso!");
+      }
     } catch (err) {
-      console.log(err.message);
+      console.log("Error on purchasing product", err);
       showToast(err.message);
     }
   }

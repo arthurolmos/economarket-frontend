@@ -13,25 +13,26 @@ function CreateShoppingListScreen({ navigation }: DefaultScreenProp) {
 
   const [name, setName] = React.useState("");
 
-  const [doCreate, { loading }] = useMutation(CREATE_SHOPPING_LIST, {
+  const [createShoppingList, { loading }] = useMutation(CREATE_SHOPPING_LIST, {
     refetchQueries: ["GetShoppingListsByUser"],
   });
 
-  async function create() {
+  async function submit() {
     try {
       const data: ShoppingListCreateInput = {
         name,
         date: new Date(),
       };
 
-      await doCreate({
+      await createShoppingList({
         variables: { userId: user?.id, data },
       });
+
       showToast("Criado com sucesso!");
       navigation.goBack();
     } catch (err) {
-      console.log(err.message);
-      showToast(err.message);
+      console.log("Error on creating Shopping List", err);
+      showToast("Erro ao criar a lista!");
     }
   }
 
@@ -52,7 +53,7 @@ function CreateShoppingListScreen({ navigation }: DefaultScreenProp) {
             <ActivityIndicator size="large" color="green" />
           ) : (
             <>
-              <Button title="Salvar" onPress={() => create()} />
+              <Button title="Salvar" onPress={() => submit()} />
             </>
           )}
         </>

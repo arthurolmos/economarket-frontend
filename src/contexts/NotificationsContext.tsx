@@ -1,16 +1,15 @@
-import { useMutation } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client";
 import React from "react";
 import { AuthContext } from "./AuthContext";
 import {
-  NOTIFICATIONS_SUBSCRIPTION,
-  SEND_NOTIFICATION,
+  CREATE_PUSH_NOTIFICATION_TOKEN,
+  DELETE_PUSH_NOTIFICATION_TOKEN,
+  GET_NOTIFICATIONS_BY_USER,
 } from "../apollo/graphql";
-import { getNotificationsByUser } from "../apollo/queries";
-import { getExpoPushToken } from "../notifications";
 import { Notification } from "../interfaces/notification";
-import * as Notifications from "expo-notifications";
-import "../notifications/register";
-import * as RootNavigation from "../navigators/RootNavigation";
+import "../config/notifications/register";
+import { addNotificationListeners } from "../config/notifications";
+import { getToken } from "../lib/notifications/getToken";
 
 interface Props {
   children: React.ReactElement;
@@ -22,88 +21,81 @@ interface IContext {
   refetch: () => void;
 }
 
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: false,
-    shouldSetBadge: false,
-  }),
-});
-
 export const NotificationsContext = React.createContext({} as IContext);
 
 export function NotificationsProvider({ children }: Props) {
   const { user } = React.useContext(AuthContext);
 
-  const { subscribeToMore, data, loading, refetch } = getNotificationsByUser(
-    user?.id
+  const { data, loading, refetch, startPolling, stopPolling } = useQuery(
+    GET_NOTIFICATIONS_BY_USER,
+    {
+      variables: {
+        userId: user?.id,
+      },
+    }
   );
+
   const notifications = data?.notificationsByUser
     ? data?.notificationsByUser
     : [];
 
-  function subscribeToNewNotifications() {
-    subscribeToMore({
-      document: NOTIFICATIONS_SUBSCRIPTION,
-      variables: { userId: user?.id },
-      updateQuery: (prev, { subscriptionData }) => {
-        if (!subscriptionData.data) return prev;
+  React.useEffect(() => {
+    addNotificationListeners();
+  }, []);
 
-        const newNotificationItem = subscriptionData.data.notificationCreated;
+  React.useEffect(() => {
+    startPolling(500);
 
-        sendNotification(newNotificationItem);
+    return () => stopPolling();
+  }, []);
 
-        return Object.assign({}, prev, {
-          notificationsByUser: [
-            newNotificationItem,
-            ...prev.notificationsByUser,
-          ],
-        });
-      },
-    });
-  }
+  const [createPushNotificationToken] = useMutation(
+    CREATE_PUSH_NOTIFICATION_TOKEN
+  );
 
-  const [doSendNotification] = useMutation(SEND_NOTIFICATION, {});
-  async function sendNotification(notification: Notification) {
+  async function registerNotificationToken(userId: string) {
     try {
-      const token = await getExpoPushToken();
+      const token = await getToken();
 
-      doSendNotification({
+      const pushNotificationToken = await createPushNotificationToken({
         variables: {
-          to: [token],
-          title: notification.title,
-          body: notification.body,
-          data: "test",
+          userId: userId,
+          token,
         },
       });
+
+      console.log("Token registered successfully", pushNotificationToken);
     } catch (err) {
-      console.log(err);
+      console.log("Error creating notification token", err);
+    }
+  }
+
+  const [deletePushNotificationToken] = useMutation(
+    DELETE_PUSH_NOTIFICATION_TOKEN
+  );
+
+  async function unregisterNotificationToken() {
+    try {
+      const token = await getToken();
+
+      await deletePushNotificationToken({
+        variables: {
+          token,
+        },
+      });
+
+      console.log("Token deleted successfully");
+    } catch (err) {
+      console.log("Error deleting notification token", err);
     }
   }
 
   React.useEffect(() => {
-    Notifications.addNotificationReceivedListener(_handleNotification);
-
-    Notifications.addNotificationResponseReceivedListener(
-      _handleNotificationResponse
-    );
-  }, []);
-
-  const _handleNotification = (notification: any) => {
-    // setNotification(notification);
-    console.log({ notification });
-  };
-
-  const _handleNotificationResponse = (response: any) => {
-    const { notification } = response;
-
-    RootNavigation.navigate("TabNavigator", {
-      screen: "Minhas Listas",
-    });
-  };
-
-  React.useEffect(() => {
-    if (user) subscribeToNewNotifications();
+    if (user) {
+      registerNotificationToken(user.id);
+    } else {
+      unregisterNotificationToken();
+    }
   }, [user]);
 
   return (

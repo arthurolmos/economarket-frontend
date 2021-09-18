@@ -1,18 +1,13 @@
-import {
-  ApolloClient,
-  defaultDataIdFromObject,
-  gql,
-  HttpLink,
-  InMemoryCache,
-  split,
-} from "@apollo/client";
+import { ApolloClient, HttpLink, InMemoryCache, split } from "@apollo/client";
 import * as Constants from "expo-constants";
 import { ListProduct } from "../../interfaces/listProduct";
 import { WebSocketLink } from "@apollo/client/link/ws";
 import { getMainDefinition } from "@apollo/client/utilities";
+import { setContext } from "@apollo/client/link/context";
+import storage from "../../storage";
 
 const httpURI =
-  process.env.NODE_ENV === "development"
+  process.env.NODE_ENV == "development"
     ? "http://" +
       Constants.default.manifest?.debuggerHost
         .split(`:`)
@@ -21,7 +16,7 @@ const httpURI =
     : "https://economarket.herokuapp.com/graphql";
 
 const wsURI =
-  process.env.NODE_ENV === "development"
+  process.env.NODE_ENV == "development"
     ? "ws://" +
       Constants.default.manifest?.debuggerHost
         .split(`:`)
@@ -29,9 +24,6 @@ const wsURI =
         .concat(`:3000/graphql`)
     : // .concat(`:3000/subscriptions`);
       "ws://economarket.herokuapp.com/graphql";
-
-console.log(httpURI);
-console.log(wsURI);
 
 const wsLink = new WebSocketLink({
   uri: wsURI,
@@ -45,6 +37,18 @@ const wsLink = new WebSocketLink({
 
 const httpLink = new HttpLink({
   uri: httpURI,
+});
+
+const authLink = setContext(async (_, { headers }) => {
+  // get the authentication token from local storage if it exists
+  const token = await storage.get("access_token");
+  // return the headers to the context so httpLink can read them
+  return {
+    headers: {
+      ...headers,
+      authorization: token ? `Bearer ${token}` : "",
+    },
+  };
 });
 
 const splitLink = split(
@@ -61,16 +65,17 @@ const splitLink = split(
 );
 
 export const client = new ApolloClient({
-  link: splitLink,
-  // uri:
-  //   "http://" +
-  //   Constants.default.manifest?.debuggerHost
-  //     .split(`:`)
-  //     .shift()
-  //     .concat(`:3000/graphql`),
-  // uri: "https://economarket.herokuapp.com/graphql",
+  link: authLink.concat(splitLink),
   cache: new InMemoryCache({
     typePolicies: {
+      User: {
+        fields: {
+          fullName(_, { variables }) {
+            console.log("im here");
+            return `${variables?.firstName} ${variables?.lastName}`;
+          },
+        },
+      },
       ShoppingList: {
         fields: {
           products: {

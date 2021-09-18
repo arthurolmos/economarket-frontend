@@ -7,6 +7,10 @@ export const GET_NOTIFICATIONS_BY_USER = gql`
       title
       body
       read
+      shoppingListId
+      user {
+        id
+      }
     }
   }
 `;

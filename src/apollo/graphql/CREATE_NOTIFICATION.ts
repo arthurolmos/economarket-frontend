@@ -3,9 +3,9 @@ import { gql } from "@apollo/client";
 export const CREATE_NOTIFICATION = gql`
   mutation CreateNotification(
     $data: NotificationsCreateInput!
-    $userId: String!
+    $email: String!
   ) {
-    createNotification(data: $data, userId: $userId) {
+    createNotification(data: $data, email: $email) {
       id
       title
       body

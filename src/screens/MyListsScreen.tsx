@@ -6,12 +6,24 @@ import { FloatingButton } from "../components/Buttons/FloatingButton";
 import { AuthContext } from "../contexts/AuthContext";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { EmptyListComponent } from "../components/ListItems";
-import { getShoppingListsByUser } from "../apollo/queries";
+import { GET_SHOPPING_LISTS_BY_USER } from "../apollo/graphql";
+import { useQuery } from "@apollo/client";
 
 function MyListsScreen({ navigation }: DefaultScreenProp) {
   const { user } = React.useContext(AuthContext);
 
-  const { loading, data, refetch } = getShoppingListsByUser(user?.id);
+  const { loading, data, refetch, startPolling, stopPolling } = useQuery(
+    GET_SHOPPING_LISTS_BY_USER,
+    {
+      variables: { userId: user?.id },
+    }
+  );
+
+  React.useEffect(() => {
+    startPolling(500);
+
+    return () => stopPolling();
+  }, [user]);
 
   const shoppingLists = data?.shoppingListsByUser;
 

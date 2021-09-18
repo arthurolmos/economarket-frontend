@@ -22,6 +22,7 @@ import {
 import { showToast } from "../Toast";
 import { Product } from "../../interfaces/product";
 import { Ionicons } from "@expo/vector-icons";
+import ScreenNavigationProp from "../../interfaces/navigation/ScreenNavigationProp";
 
 interface Props {
   product: Product;
@@ -32,7 +33,7 @@ export function ProductListItem(props: Props) {
 
   const { product } = props;
 
-  const navigation = useNavigation();
+  const navigation = useNavigation<ScreenNavigationProp>();
 
   const [doDeleteProduct, { loading }] = useMutation(DELETE_PRODUCT, {
     refetchQueries: [
@@ -51,8 +52,8 @@ export function ProductListItem(props: Props) {
 
       showToast("Produto excluído com sucesso!");
     } catch (err) {
-      console.log(err);
-      showToast("Erro ao excluir produto!");
+      console.log("Error on deleting product!", err);
+      showToast(err.message);
     }
   }
 
@@ -87,7 +88,13 @@ export function ProductListItem(props: Props) {
           <Text>{product.brand}</Text>
         </View>
         <View style={styles.right}>
-          <TouchableOpacity>
+          <TouchableOpacity
+            onPress={() =>
+              navigation.navigate("EditProduct", {
+                id: product.id,
+              })
+            }
+          >
             <Ionicons name="create" size={32} color="gray" />
           </TouchableOpacity>
           {loading ? (

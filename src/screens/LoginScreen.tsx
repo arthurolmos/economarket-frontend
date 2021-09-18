@@ -3,7 +3,6 @@ import {
   StyleSheet,
   Text,
   View,
-  Button,
   ActivityIndicator,
   TouchableOpacity,
 } from "react-native";
@@ -15,6 +14,7 @@ import { showToast } from "../components/Toast";
 import { DefaultInput } from "../components/Inputs";
 import { SafeAreaView } from "react-native-safe-area-context";
 import DefaultButton from "../components/Buttons/DefaultButton";
+import { validateLogin } from "../lib/validations";
 
 function LoginScreen({ navigation }: DefaultScreenProp) {
   const { signIn } = React.useContext(AuthContext);
@@ -22,24 +22,25 @@ function LoginScreen({ navigation }: DefaultScreenProp) {
   const [username, setUsername] = React.useState("");
   const [password, setPassword] = React.useState("");
 
-  const [doLogin, { loading }] = useMutation(LOGIN, {
+  const [login, { loading }] = useMutation(LOGIN, {
     fetchPolicy: "no-cache",
   });
 
-  async function login() {
+  async function submit() {
     try {
-      if (username === "" || password === "")
+      if (!validateLogin({ username, password }))
         throw new Error("Preencha os campos corretmente!");
 
-      const { data } = await doLogin({ variables: { username, password } });
+      const { data } = await login({
+        variables: { username, password },
+      });
 
-      if (data) {
-        const { token, user } = data.login;
-        signIn(token, user);
-      }
+      const { token, user } = data.login;
+
+      signIn(token, user);
     } catch (err) {
-      console.log(err.message);
-      showToast(err.message);
+      console.log("Error on Login!", err);
+      showToast("Erro ao logar!");
     }
   }
 
@@ -74,7 +75,7 @@ function LoginScreen({ navigation }: DefaultScreenProp) {
               <View style={{ marginBottom: 15, marginTop: 15 }}>
                 <DefaultButton
                   title="Entrar"
-                  action={login}
+                  action={submit}
                   color="lightgreen"
                   bgColor="green"
                 />
@@ -92,14 +93,6 @@ function LoginScreen({ navigation }: DefaultScreenProp) {
               >
                 <Text>Criar uma conta!</Text>
               </TouchableOpacity>
-
-              {/* <Button
-                onPress={() => {
-                  setUsername("mc@gmail.com");
-                  setPassword("123");
-                }}
-                title="Fill"
-              /> */}
             </>
           )}
         </>

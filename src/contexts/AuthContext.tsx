@@ -1,7 +1,8 @@
-import { useMutation, useQuery, useSubscription } from "@apollo/client";
 import React from "react";
 import { User } from "../interfaces/user";
 import storage from "../storage";
+import { useQuery } from "@apollo/client";
+import { WHO_AM_I } from "../apollo/graphql";
 
 interface Props {
   children: React.ReactElement;
@@ -17,6 +18,18 @@ export const AuthContext = React.createContext({} as IContext);
 
 export function AuthProvider({ children }: Props) {
   const [user, setUser] = React.useState<User | null>(null);
+
+  const { loading, data } = useQuery(WHO_AM_I, {
+    fetchPolicy: "no-cache",
+  });
+  const signedUser = data?.whoAmI;
+
+  React.useEffect(() => {
+    if (signedUser) {
+      console.log(signedUser);
+      setUser(signedUser);
+    }
+  }, [data]);
 
   const signIn = async (access_token: string, user: any) => {
     await storage.save("access_token", access_token);

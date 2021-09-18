@@ -5,14 +5,10 @@ import { AuthContext } from "../contexts/AuthContext";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { FloatingButton } from "../components/Buttons";
 import { EmptyListComponent, ProductListItem } from "../components/ListItems";
-import { getProductsByUser } from "../apollo/queries";
+import { ProductsContext } from "../contexts";
 
 function ProductsScreen({ navigation }: DefaultScreenProp) {
-  const { user } = React.useContext(AuthContext);
-
-  const { loading, data, refetch } = getProductsByUser(user?.id);
-
-  const products = data?.productsByUser;
+  const { products, refetch, loading } = React.useContext(ProductsContext);
 
   return (
     <SafeAreaView style={styles.container}>

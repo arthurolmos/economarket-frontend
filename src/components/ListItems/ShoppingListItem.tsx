@@ -10,6 +10,7 @@ import {
   LEAVE_SHARED_SHOPPING_LIST,
 } from "../../apollo/graphql";
 import { showToast } from "../Toast";
+import ScreenNavigationProp from "../../interfaces/navigation/ScreenNavigationProp";
 
 interface Props {
   shoppingList: ShoppingList;
@@ -20,7 +21,7 @@ export function ShoppingListItem(props: Props) {
 
   const { shoppingList } = props;
 
-  const navigation = useNavigation();
+  const navigation = useNavigation<ScreenNavigationProp>();
 
   const [doLeaveShoppingList, leavingShoppingList] = useMutation(
     LEAVE_SHARED_SHOPPING_LIST,
@@ -34,12 +35,17 @@ export function ShoppingListItem(props: Props) {
     }
   );
 
-  function leaveShoppingList() {
-    doLeaveShoppingList({
-      variables: { id: shoppingList.id, userId: user?.id },
-    })
-      .then(() => showToast("Saida com sucesso!"))
-      .catch((err) => console.log(err));
+  async function leaveShoppingList() {
+    try {
+      await doLeaveShoppingList({
+        variables: { id: shoppingList.id, userId: user?.id },
+      });
+
+      showToast("Saida com sucesso!");
+    } catch (err) {
+      console.log("Error on leaing Shopping List", err);
+      console.log(err.message);
+    }
   }
 
   const [doDeleteShoppingList, deletingShoppinList] = useMutation(
@@ -54,12 +60,16 @@ export function ShoppingListItem(props: Props) {
     }
   );
 
-  function deleteShoppingList() {
-    doDeleteShoppingList({
-      variables: { id: shoppingList.id, userId: user?.id },
-    })
-      .then(() => showToast("Lista excluída com sucesso!"))
-      .catch((err) => console.log(err));
+  async function deleteShoppingList() {
+    try {
+      await doDeleteShoppingList({
+        variables: { id: shoppingList.id, userId: user?.id },
+      });
+
+      showToast("Lista excluída com sucesso!");
+    } catch (err) {
+      console.log("Error on deleting Shopping List!", err);
+    }
   }
 
   return (

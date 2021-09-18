@@ -10,11 +10,7 @@ export const GET_SHOPPING_LIST = gql`
         firstName
         lastName
       }
-      sharedUsers {
-        id
-        firstName
-        lastName
-      }
+
       listProducts {
         id
         name
