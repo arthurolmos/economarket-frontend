@@ -12,7 +12,7 @@ import { addNotificationListeners } from "../config/notifications";
 import { getToken } from "../lib/notifications/getToken";
 
 interface Props {
-  children: React.ReactElement;
+  children: React.ReactElement[] | React.ReactElement;
 }
 
 interface IContext {

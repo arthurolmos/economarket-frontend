@@ -1,20 +1,19 @@
 import React from "react";
-import { StyleSheet, Text, View, Button } from "react-native";
+import { StyleSheet, Text, View, Button, FlatList } from "react-native";
 import DefaultScreenProp from "../interfaces/navigation/DefaultScreenProp";
 import { NotificationsContext } from "../contexts/NotificationsContext";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { FlatList } from "react-native-gesture-handler";
 import {
   EmptyListComponent,
   NotificationListItem,
-} from "../components/ListItems";
+} from "../components/list-items";
+import { DefaultSafeAreaContainer } from "../components/layout/DefaultSafeAreaContainer";
 
 function NotificationsScreen({ navigation }: DefaultScreenProp) {
   const { notifications, loading, refetch } =
     React.useContext(NotificationsContext);
 
   return (
-    <SafeAreaView style={styles.container}>
+    <DefaultSafeAreaContainer>
       <FlatList
         refreshing={loading}
         onRefresh={refetch}
@@ -26,7 +25,7 @@ function NotificationsScreen({ navigation }: DefaultScreenProp) {
         ListEmptyComponent={() => <EmptyListComponent loading={loading} />}
         ItemSeparatorComponent={() => <View style={styles.separator} />}
       />
-    </SafeAreaView>
+    </DefaultSafeAreaContainer>
   );
 }
 

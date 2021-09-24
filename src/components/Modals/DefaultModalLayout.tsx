@@ -9,12 +9,12 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { DefaultTitle } from "../Text";
+import { DefaultTitle } from "../texts";
 
 interface Props {
   isOpen: boolean;
   close: () => void;
-  children: React.ReactElement;
+  children: React.ReactElement[] | React.ReactElement;
   submit: () => void;
   loading: boolean;
   title: string;
@@ -44,7 +44,7 @@ export function DefaultModalLayout(props: Props) {
           {children}
 
           {loading ? (
-            <ActivityIndicator size="small" color="green" />
+            <ActivityIndicator size="small" color="lightgreen" />
           ) : (
             <Button title="Confirmar" onPress={submit} />
           )}

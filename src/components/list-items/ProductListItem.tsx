@@ -19,7 +19,7 @@ import {
   GET_SHOPPING_LISTS_BY_USER,
   LEAVE_SHARED_SHOPPING_LIST,
 } from "../../apollo/graphql";
-import { showToast } from "../Toast";
+import { showToast } from "../toast";
 import { Product } from "../../interfaces/product";
 import { Ionicons } from "@expo/vector-icons";
 import ScreenNavigationProp from "../../interfaces/navigation/ScreenNavigationProp";
@@ -98,7 +98,7 @@ export function ProductListItem(props: Props) {
             <Ionicons name="create" size={32} color="gray" />
           </TouchableOpacity>
           {loading ? (
-            <ActivityIndicator size="small" color="green" />
+            <ActivityIndicator size="small" color="lightgreen" />
           ) : (
             <TouchableOpacity onPress={showConfirmAlert}>
               <Ionicons name="trash" size={32} color="gray" />

@@ -16,7 +16,7 @@ import {
   READ_NOTIFICATION,
   SHARE_SHOPPING_LIST,
 } from "../../apollo/graphql";
-import { showToast } from "../Toast";
+import { showToast } from "../toast";
 
 interface Props {
   notification: Notification;

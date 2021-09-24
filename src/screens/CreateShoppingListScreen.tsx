@@ -1,17 +1,23 @@
 import React from "react";
-import { StyleSheet, View, Button, ActivityIndicator } from "react-native";
+import { View } from "react-native";
 import { AuthContext } from "../contexts/AuthContext";
 import DefaultScreenProp from "../interfaces/navigation/DefaultScreenProp";
 import { useMutation } from "@apollo/client";
 import { CREATE_SHOPPING_LIST } from "../apollo/graphql";
-import { showToast } from "../components/Toast";
-import { DefaultInput } from "../components/Inputs";
+import { showToast } from "../components/toast";
+import { DefaultDatePicker, DefaultInput } from "../components/inputs";
 import { ShoppingListCreateInput } from "../interfaces/shoppingList";
+import { validateCreateShoppingList } from "../lib/validations/validateCreateShoppingList";
+import { SaveButton } from "../components/buttons";
+import { DefaultSafeAreaContainer } from "../components/layout/DefaultSafeAreaContainer";
 
 function CreateShoppingListScreen({ navigation }: DefaultScreenProp) {
   const { user } = React.useContext(AuthContext);
 
   const [name, setName] = React.useState("");
+  const [date, setDate] = React.useState(new Date());
+
+  const cb = (date: Date) => setDate(date);
 
   const [createShoppingList, { loading }] = useMutation(CREATE_SHOPPING_LIST, {
     refetchQueries: ["GetShoppingListsByUser"],
@@ -21,8 +27,11 @@ function CreateShoppingListScreen({ navigation }: DefaultScreenProp) {
     try {
       const data: ShoppingListCreateInput = {
         name,
-        date: new Date(),
+        date: date,
       };
+
+      if (!validateCreateShoppingList(data))
+        throw new Error("Preencha os campos corretamente!");
 
       await createShoppingList({
         variables: { userId: user?.id, data },
@@ -32,13 +41,15 @@ function CreateShoppingListScreen({ navigation }: DefaultScreenProp) {
       navigation.goBack();
     } catch (err) {
       console.log("Error on creating Shopping List", err);
-      showToast("Erro ao criar a lista!");
+      showToast(err.message);
     }
   }
 
   return (
-    <View style={styles.container}>
-      <DefaultInput value={name} onChangeText={setName} placeholder="Name" />
+    <DefaultSafeAreaContainer loading={loading}>
+      <DefaultInput value={name} onChangeText={setName} placeholder="Nome" />
+
+      <DefaultDatePicker cb={cb} date={date} />
 
       <View
         style={{
@@ -48,25 +59,10 @@ function CreateShoppingListScreen({ navigation }: DefaultScreenProp) {
           padding: 15,
         }}
       >
-        <>
-          {loading ? (
-            <ActivityIndicator size="large" color="green" />
-          ) : (
-            <>
-              <Button title="Salvar" onPress={() => submit()} />
-            </>
-          )}
-        </>
+        <SaveButton action={submit} />
       </View>
-    </View>
+    </DefaultSafeAreaContainer>
   );
 }
 
 export default CreateShoppingListScreen;
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 15,
-  },
-});

@@ -1,17 +1,16 @@
 import React from "react";
-import { StyleSheet, Text, View, Button, FlatList } from "react-native";
+import { StyleSheet, View, Button, FlatList, Text } from "react-native";
 import DefaultScreenProp from "../interfaces/navigation/DefaultScreenProp";
-import { AuthContext } from "../contexts/AuthContext";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { FloatingButton } from "../components/Buttons";
-import { EmptyListComponent, ProductListItem } from "../components/ListItems";
+import { FloatingButton } from "../components/buttons";
+import { EmptyListComponent, ProductListItem } from "../components/list-items";
 import { ProductsContext } from "../contexts";
+import { DefaultSafeAreaContainer } from "../components/layout/DefaultSafeAreaContainer";
 
 function ProductsScreen({ navigation }: DefaultScreenProp) {
   const { products, refetch, loading } = React.useContext(ProductsContext);
 
   return (
-    <SafeAreaView style={styles.container}>
+    <DefaultSafeAreaContainer>
       <FlatList
         refreshing={loading}
         onRefresh={refetch}
@@ -27,18 +26,13 @@ function ProductsScreen({ navigation }: DefaultScreenProp) {
       <FloatingButton
         action={() => navigation.navigate("CreateShoppingList")}
       />
-    </SafeAreaView>
+    </DefaultSafeAreaContainer>
   );
 }
 
 export default ProductsScreen;
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 15,
-    position: "relative",
-  },
   separator: {
     height: 10,
   },

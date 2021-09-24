@@ -9,11 +9,8 @@ import TabNavigator from "./TabNavigator";
 import CreateShoppingListScreen from "../screens/CreateShoppingListScreen";
 import ShoppingListScreen from "../screens/ShoppingListScreen";
 import EditListProductScreen from "../screens/EditListProdutScreen";
-import { NotificationButton } from "../components/Buttons";
+import { NotificationButton } from "../components/buttons";
 import NotificationsScreen from "../screens/NotificationsScreen";
-import * as Linking from "expo-linking";
-import { Text } from "react-native";
-import * as Constants from "expo-constants";
 import { navigationRef } from "./RootNavigation";
 import EditProductScreen from "../screens/EditProductScreen";
 
@@ -21,12 +18,6 @@ const Stack = createStackNavigator<RootStackParamList>();
 
 function StackNavigator() {
   const { user } = React.useContext(AuthContext);
-
-  // const linking = {
-  //   prefixes: ["exp://192.168.15.5:19000/"],
-  // };
-
-  // console.log(linking);
 
   return (
     <NavigationContainer ref={navigationRef}>
@@ -66,27 +57,27 @@ function StackNavigator() {
             <Stack.Screen
               name="CreateShoppingList"
               component={CreateShoppingListScreen}
-              options={{ title: "Create Shopping List" }}
+              options={{ title: "Criar Lista de Compras" }}
             />
             <Stack.Screen
               name="ShoppingList"
               component={ShoppingListScreen}
-              options={{ title: "Shopping List" }}
+              options={{ title: "Lista de Compras" }}
             />
             <Stack.Screen
               name="EditListProduct"
               component={EditListProductScreen}
-              options={{ title: "Edit List Product" }}
+              options={{ title: "Editar Produto da Lista" }}
             />
             <Stack.Screen
               name="EditProduct"
               component={EditProductScreen}
-              options={{ title: "Edit Product" }}
+              options={{ title: "Editar Produto" }}
             />
             <Stack.Screen
               name="Notifications"
               component={NotificationsScreen}
-              options={{ title: "Notifications" }}
+              options={{ title: "Notificações" }}
             />
           </>
         )}

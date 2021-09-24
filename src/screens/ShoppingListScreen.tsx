@@ -15,26 +15,25 @@ import {
   GET_SHOPPING_LIST_BY_USER,
   CREATE_LIST_PRODUCT,
   READ_PRODUCTS_BY_USER,
-  GET_SHOPPING_LIST,
 } from "../apollo/graphql";
-import { showToast } from "../components/Toast";
-import { DefaultInput } from "../components/Inputs";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { showToast } from "../components/toast";
+import { DefaultInput } from "../components/inputs";
 import ParamScreenProp from "../interfaces/navigation/ParamScreenProp";
 import {
   ListHintProductListItem,
   ListProductListItem,
-} from "../components/ListItems";
+} from "../components/list-items";
 import { ShoppingList } from "../interfaces/shoppingList";
 import { ListProduct, ListProductCreateInput } from "../interfaces/listProduct";
-import { DefaultSubtitle, DefaultTitle } from "../components/Text";
-import { EmptyListComponent } from "../components/ListItems";
-import { ShareShoppingListModal } from "../components/Modals";
+import { DefaultSubtitle, DefaultTitle } from "../components/texts";
+import { EmptyListComponent } from "../components/list-items";
+import { ShareShoppingListModal } from "../components/modals";
 import { Ionicons } from "@expo/vector-icons";
 import { Product } from "../interfaces/product";
-import { CreateProductModal } from "../components/Modals/CreateProductModal";
+import { CreateProductModal } from "../components/modals/CreateProductModal";
 import { validateListProduct } from "../lib/validations";
 import { client } from "../apollo/client";
+import { DefaultSafeAreaContainer } from "../components/layout/DefaultSafeAreaContainer";
 
 function ShoppingListScreen({
   route,
@@ -169,181 +168,170 @@ function ShoppingListScreen({
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      {getShoppingListResult.loading ? (
-        <ActivityIndicator size="large" color="green" />
-      ) : (
-        <>
-          <View>
-            <View style={styles.header}>
-              <View style={{ display: "flex", flexDirection: "row" }}>
-                <View style={{ display: "flex", flex: 1 }}>
-                  <DefaultTitle>{shoppingList?.name}</DefaultTitle>
-                  <Text>Criada por {username}</Text>
-                </View>
-
-                {shoppingList?.isOwner && (
-                  <TouchableOpacity style={styles.shareButton}>
-                    <Ionicons
-                      name="share-social"
-                      size={32}
-                      color="gray"
-                      onPress={openShareModal}
-                    />
-                  </TouchableOpacity>
-                )}
-              </View>
-
-              <View style={{ display: "flex" }}>
-                {/* <Text>{sharedWith}</Text> */}
-                <Text>TOTAL: R$ {shoppingList?.totalPrice?.toFixed(2)}</Text>
-                <Text>
-                  Produtos: {purchasedListItemsTotal} / {listProductsTotal}
-                </Text>
-              </View>
+    <DefaultSafeAreaContainer loading={getShoppingListResult.loading}>
+      <View>
+        <View style={styles.header}>
+          <View style={{ display: "flex", flexDirection: "row" }}>
+            <View style={{ display: "flex", flex: 1 }}>
+              <DefaultTitle>{shoppingList?.name}</DefaultTitle>
+              <Text>Criada por {username}</Text>
             </View>
 
-            <View style={styles.inputContainer}>
-              <DefaultSubtitle>Adicionar Produtos</DefaultSubtitle>
-
-              <DefaultInput
-                value={name}
-                onChangeText={(text) => {
-                  setName(text);
-                  getHints(text);
-                }}
-                placeholder="Nome"
-              />
-              {hints?.length > 0 && (
-                <View style={styles.hintContainer}>
-                  <View
-                    style={{
-                      display: "flex",
-                      alignItems: "flex-end",
-                    }}
-                  >
-                    <TouchableOpacity onPress={clearHints}>
-                      <Ionicons name="close" size={20} />
-                    </TouchableOpacity>
-                  </View>
-                  <FlatList
-                    data={hints}
-                    renderItem={({ item }) => {
-                      return (
-                        <ListHintProductListItem
-                          product={item}
-                          action={fillProduct}
-                        />
-                      );
-                    }}
-                    keyExtractor={(item) => item.id}
-                    ItemSeparatorComponent={() => (
-                      <View style={styles.separator} />
-                    )}
-                  />
-                </View>
-              )}
-
-              <View style={styles.inputRow}>
-                <View style={styles.inputRight}>
-                  <DefaultInput
-                    placeholder="Quantidade"
-                    value={quantity}
-                    onChangeText={setQuantity}
-                    keyboardType="numeric"
-                    ref={quantityInputRef}
-                  />
-                </View>
-                <View style={styles.inputLeft}>
-                  <DefaultInput
-                    placeholder="Preço Unitário"
-                    value={price}
-                    onChangeText={setPrice}
-                    keyboardType="numeric"
-                  />
-                </View>
-              </View>
-              {isOpen && (
-                <>
-                  <DefaultInput
-                    value={brand}
-                    onChangeText={setBrand}
-                    placeholder="Marca"
-                  />
-
-                  <DefaultInput
-                    value={market}
-                    onChangeText={setMarket}
-                    placeholder="Mercado"
-                  />
-                </>
-              )}
-              <View style={styles.inputRow}>
-                <View style={styles.inputRight}>
-                  <TouchableOpacity
-                    onPress={toggle}
-                    style={styles.toggleButton}
-                  >
-                    <Text>{isOpen ? "...Menos" : "Mais..."}</Text>
-                  </TouchableOpacity>
-                </View>
-
-                <View style={styles.inputLeft}>
-                  {createListProductResult.loading ? (
-                    <ActivityIndicator size="small" color="green" />
-                  ) : (
-                    <TouchableOpacity
-                      onPress={() => {
-                        Keyboard.dismiss();
-                        addProductToShoppingList();
-                      }}
-                      style={styles.addButton}
-                    >
-                      <Text style={{ color: "lightgreen" }}>Add</Text>
-                    </TouchableOpacity>
-                  )}
-                </View>
-              </View>
-            </View>
+            {shoppingList?.isOwner && (
+              <TouchableOpacity style={styles.shareButton}>
+                <Ionicons
+                  name="share-social"
+                  size={32}
+                  color="gray"
+                  onPress={openShareModal}
+                />
+              </TouchableOpacity>
+            )}
           </View>
 
-          <FlatList
-            refreshing={getShoppingListResult.loading}
-            data={shoppingList?.listProducts}
-            renderItem={({ item }) => {
-              const product = { ...item };
+          <View style={{ display: "flex" }}>
+            {/* <Text>{sharedWith}</Text> */}
+            <Text>TOTAL: R$ {shoppingList?.totalPrice.toFixed(2)}</Text>
+            <Text>
+              Produtos: {purchasedListItemsTotal} / {listProductsTotal}
+            </Text>
+          </View>
+        </View>
 
-              return (
-                <ListProductListItem
-                  product={product}
-                  openModal={openAddProductModal}
-                />
-              );
+        <View style={styles.inputContainer}>
+          <DefaultSubtitle>Adicionar Produtos</DefaultSubtitle>
+
+          <DefaultInput
+            value={name}
+            onChangeText={(text) => {
+              setName(text);
+              getHints(text);
             }}
-            keyExtractor={(item) => {
-              return item.id;
-            }}
-            ListHeaderComponentStyle={styles.listHeader}
-            ListEmptyComponent={() => (
-              <EmptyListComponent loading={getShoppingListResult.loading} />
-            )}
-            ItemSeparatorComponent={() => <View style={styles.separator} />}
+            placeholder="Nome"
           />
+          {hints?.length > 0 && (
+            <View style={styles.hintContainer}>
+              <View
+                style={{
+                  display: "flex",
+                  alignItems: "flex-end",
+                }}
+              >
+                <TouchableOpacity onPress={clearHints}>
+                  <Ionicons name="close" size={20} />
+                </TouchableOpacity>
+              </View>
+              <FlatList
+                data={hints}
+                renderItem={({ item }) => {
+                  return (
+                    <ListHintProductListItem
+                      product={item}
+                      action={fillProduct}
+                    />
+                  );
+                }}
+                keyExtractor={(item) => item.id}
+                ItemSeparatorComponent={() => <View style={styles.separator} />}
+              />
+            </View>
+          )}
 
-          <ShareShoppingListModal
-            isOpen={shareModalVisible}
-            close={closeShareModal}
-            shoppingListId={shoppingList?.id ? shoppingList.id : ""}
-          />
+          <View style={styles.inputRow}>
+            <View style={styles.inputRight}>
+              <DefaultInput
+                placeholder="Quantidade"
+                value={quantity}
+                onChangeText={setQuantity}
+                keyboardType="numeric"
+                ref={quantityInputRef}
+              />
+            </View>
+            <View style={styles.inputLeft}>
+              <DefaultInput
+                placeholder="Preço Unitário"
+                value={price}
+                onChangeText={setPrice}
+                keyboardType="numeric"
+              />
+            </View>
+          </View>
+          {isOpen && (
+            <>
+              <DefaultInput
+                value={brand}
+                onChangeText={setBrand}
+                placeholder="Marca"
+              />
 
-          <CreateProductModal
-            isOpen={addProductModalVisible}
-            close={closeAddProductModal}
-            product={modalProduct}
-          />
-        </>
-      )}
-    </SafeAreaView>
+              <DefaultInput
+                value={market}
+                onChangeText={setMarket}
+                placeholder="Mercado"
+              />
+            </>
+          )}
+          <View style={styles.inputRow}>
+            <View style={styles.inputRight}>
+              <TouchableOpacity onPress={toggle} style={styles.toggleButton}>
+                <Text>{isOpen ? "...Menos" : "Mais..."}</Text>
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.inputLeft}>
+              {createListProductResult.loading ? (
+                <ActivityIndicator size="small" color="lightgreen" />
+              ) : (
+                <TouchableOpacity
+                  onPress={() => {
+                    Keyboard.dismiss();
+                    addProductToShoppingList();
+                  }}
+                  style={styles.addButton}
+                >
+                  <Text style={{ color: "green" }}>Add</Text>
+                </TouchableOpacity>
+              )}
+            </View>
+          </View>
+        </View>
+      </View>
+
+      <FlatList
+        refreshing={getShoppingListResult.loading}
+        data={shoppingList?.listProducts}
+        renderItem={({ item }) => {
+          const product = { ...item };
+
+          return (
+            <ListProductListItem
+              product={product}
+              openModal={openAddProductModal}
+            />
+          );
+        }}
+        keyExtractor={(item) => {
+          return item.id;
+        }}
+        ListHeaderComponentStyle={styles.listHeader}
+        ListEmptyComponent={() => (
+          <EmptyListComponent loading={getShoppingListResult.loading} />
+        )}
+        ItemSeparatorComponent={() => <View style={styles.separator} />}
+      />
+
+      <ShareShoppingListModal
+        isOpen={shareModalVisible}
+        close={closeShareModal}
+        shoppingList={shoppingList}
+      />
+
+      <CreateProductModal
+        isOpen={addProductModalVisible}
+        close={closeAddProductModal}
+        product={modalProduct}
+      />
+    </DefaultSafeAreaContainer>
   );
 }
 
@@ -377,6 +365,7 @@ const styles = StyleSheet.create({
   },
   toggleButton: {
     borderWidth: 1,
+    borderColor: "gray",
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
@@ -386,8 +375,8 @@ const styles = StyleSheet.create({
   },
   addButton: {
     borderWidth: 1,
-    borderColor: "lightgreen",
-    backgroundColor: "green",
+    borderColor: "green",
+    backgroundColor: "lightgreen",
     display: "flex",
     justifyContent: "center",
     alignItems: "center",

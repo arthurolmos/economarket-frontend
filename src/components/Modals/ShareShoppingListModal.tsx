@@ -2,18 +2,19 @@ import { useMutation } from "@apollo/client";
 import React from "react";
 import { CREATE_NOTIFICATION } from "../../apollo/graphql";
 import { AuthContext } from "../../contexts";
-import { DefaultInput } from "../Inputs";
-import { showToast } from "../Toast";
+import { ShoppingList } from "../../interfaces/shoppingList";
+import { DefaultInput } from "../inputs";
+import { showToast } from "../toast";
 import { DefaultModalLayout } from "./DefaultModalLayout";
 
 interface Props {
   isOpen: boolean;
   close: () => void;
-  shoppingListId: string;
+  shoppingList: ShoppingList;
 }
 
 export function ShareShoppingListModal(props: Props) {
-  const { isOpen, close, shoppingListId = "" } = props;
+  const { isOpen, close, shoppingList } = props;
 
   const { user } = React.useContext(AuthContext);
 
@@ -25,9 +26,9 @@ export function ShareShoppingListModal(props: Props) {
       if (email === "") throw new Error("Preencha os dados corretamente!");
 
       const input = {
-        shoppingListId,
+        shoppingListId: shoppingList.id,
         title: "Olha só!",
-        body: `O usuário ${user?.firstName} ${user?.lastName} compartilhou uma lista com você!`,
+        body: `O usuário ${user?.firstName} ${user?.lastName} compartilhou a lista ${shoppingList.name} com você!`,
       };
 
       await createNotification({

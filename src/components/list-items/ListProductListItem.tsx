@@ -15,7 +15,7 @@ import {
   CREATE_PRODUCT,
 } from "../../apollo/graphql";
 import { ListProduct } from "../../interfaces/listProduct";
-import { showToast } from "../Toast";
+import { showToast } from "../toast";
 import { Swipeable } from "react-native-gesture-handler";
 import { Ionicons } from "@expo/vector-icons";
 import { Product } from "../../interfaces/product";
@@ -30,6 +30,8 @@ export function ListProductListItem(props: Props) {
   const { product, openModal } = props;
 
   const navigation = useNavigation<ScreenNavigationProp>();
+
+  const swipeRef = React.useRef<Swipeable>(null);
 
   const totalPrice = product.price * product.quantity;
 
@@ -82,8 +84,6 @@ export function ListProductListItem(props: Props) {
     }
   }
 
-  const swipeRef = React.useRef<Swipeable>(null);
-
   const renderLeftActions = () => {
     return (
       <TouchableOpacity
@@ -93,9 +93,9 @@ export function ListProductListItem(props: Props) {
         }}
       >
         {deleting.loading ? (
-          <ActivityIndicator size="small" color="darkred" />
+          <ActivityIndicator size="small" color="lightpink" />
         ) : (
-          <Ionicons name="trash" size={32} />
+          <Ionicons name="trash" size={32} color="lightpink" />
         )}
       </TouchableOpacity>
     );
@@ -108,7 +108,7 @@ export function ListProductListItem(props: Props) {
           styles.rightActionPanel,
           product.purchased
             ? { backgroundColor: "lightblue" }
-            : { backgroundColor: "green" },
+            : { backgroundColor: "lightgreen" },
         ]}
         onPress={async () => {
           await purchaseListProduct();
@@ -120,9 +120,9 @@ export function ListProductListItem(props: Props) {
         ) : (
           <Text>
             {product.purchased ? (
-              <Ionicons name="close" size={32} />
+              <Ionicons name="close" size={32} color="blue" />
             ) : (
-              <Ionicons name="cart" size={32} />
+              <Ionicons name="cart" size={32} color="green" />
             )}
           </Text>
         )}
@@ -143,7 +143,7 @@ export function ListProductListItem(props: Props) {
           styles.container,
           product.purchased
             ? { backgroundColor: "lightgreen" }
-            : { backgroundColor: "lightgray" },
+            : { backgroundColor: "white" },
         ]}
       >
         <View style={{ display: "flex", flex: 1 }}>
@@ -178,6 +178,7 @@ const styles = StyleSheet.create({
     display: "flex",
     flexDirection: "row",
     padding: 15,
+    borderRadius: 5,
   },
   productName: {
     fontSize: 14,
@@ -190,6 +191,8 @@ const styles = StyleSheet.create({
     width: "30%",
     justifyContent: "center",
     alignItems: "center",
+    borderTopLeftRadius: 5,
+    borderBottomLeftRadius: 5,
   },
   rightActionPanel: {
     backgroundColor: "lightgreen",
@@ -197,6 +200,8 @@ const styles = StyleSheet.create({
     width: "30%",
     justifyContent: "center",
     alignItems: "center",
+    borderTopRightRadius: 5,
+    borderBottomRightRadius: 5,
   },
 
   buttonContainer: {

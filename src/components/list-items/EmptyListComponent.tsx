@@ -11,7 +11,7 @@ export function EmptyListComponent(props: Props) {
   return (
     <View style={styles.container}>
       <Text style={styles.text}>
-        {loading ? "Carregando" : "Lista vazia! Adicione produtos!"}
+        {loading ? "Carregando" : "Sem itens cadastrados!"}
       </Text>
     </View>
   );

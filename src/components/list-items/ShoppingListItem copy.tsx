@@ -9,7 +9,7 @@ import {
   GET_SHOPPING_LISTS_BY_USER,
   LEAVE_SHARED_SHOPPING_LIST,
 } from "../../apollo/graphql";
-import { showToast } from "../Toast";
+import { showToast } from "../toast";
 import ScreenNavigationProp from "../../interfaces/navigation/ScreenNavigationProp";
 
 interface Props {
@@ -86,11 +86,10 @@ export function ShoppingListItem(props: Props) {
               Criado por{" "}
               {`${shoppingList?.user?.firstName} ${shoppingList?.user?.lastName}`}
             </Text>
-            <Text>{shoppingList.isOwner ? "OWNER" : "SHARED"}</Text>
           </View>
           <View style={styles.right}>
             <Text style={styles.price}>
-              R$ {shoppingList.totalPrice?.toFixed(2)}
+              R$ {shoppingList.totalPrice.toFixed(2)}
             </Text>
           </View>
         </View>

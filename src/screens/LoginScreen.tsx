@@ -10,10 +10,10 @@ import { AuthContext } from "../contexts/AuthContext";
 import DefaultScreenProp from "../interfaces/navigation/DefaultScreenProp";
 import { useMutation } from "@apollo/client";
 import { LOGIN } from "../apollo/graphql";
-import { showToast } from "../components/Toast";
-import { DefaultInput } from "../components/Inputs";
+import { showToast } from "../components/toast";
+import { DefaultInput } from "../components/inputs";
 import { SafeAreaView } from "react-native-safe-area-context";
-import DefaultButton from "../components/Buttons/DefaultButton";
+import DefaultButton from "../components/buttons/DefaultButton";
 import { validateLogin } from "../lib/validations";
 
 function LoginScreen({ navigation }: DefaultScreenProp) {
@@ -69,7 +69,7 @@ function LoginScreen({ navigation }: DefaultScreenProp) {
       >
         <>
           {loading ? (
-            <ActivityIndicator size="large" color="green" />
+            <ActivityIndicator size="large" color="lightgreen" />
           ) : (
             <>
               <View style={{ marginBottom: 15, marginTop: 15 }}>

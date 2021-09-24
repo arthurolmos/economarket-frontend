@@ -12,5 +12,5 @@ export interface ShoppingList {
   listProducts?: ListProduct[];
 
   isOwner?: boolean;
-  totalPrice?: number;
+  totalPrice: number;
 }

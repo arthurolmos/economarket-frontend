@@ -1,38 +1,26 @@
 import React from "react";
-import { StyleSheet, Text, View, Button, FlatList } from "react-native";
+import { StyleSheet, View, FlatList } from "react-native";
 import DefaultScreenProp from "../interfaces/navigation/DefaultScreenProp";
-import { ShoppingListItem } from "../components/ListItems";
-import { FloatingButton } from "../components/Buttons/FloatingButton";
-import { AuthContext } from "../contexts/AuthContext";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { EmptyListComponent } from "../components/ListItems";
-import { GET_SHOPPING_LISTS_BY_USER } from "../apollo/graphql";
-import { useQuery } from "@apollo/client";
+import { ShoppingListItem } from "../components/list-items";
+import { FloatingButton } from "../components/buttons/FloatingButton";
+import { EmptyListComponent } from "../components/list-items";
+import { ShoppingListsContext } from "../contexts";
+import { DefaultSafeAreaContainer } from "../components/layout/DefaultSafeAreaContainer";
 
 function MyListsScreen({ navigation }: DefaultScreenProp) {
-  const { user } = React.useContext(AuthContext);
+  const { shoppingLists, loading, refetch } =
+    React.useContext(ShoppingListsContext);
 
-  const { loading, data, refetch, startPolling, stopPolling } = useQuery(
-    GET_SHOPPING_LISTS_BY_USER,
-    {
-      variables: { userId: user?.id },
-    }
+  const openShoppingLists = shoppingLists.filter(
+    (shoppingList) => !shoppingList.done
   );
 
-  React.useEffect(() => {
-    startPolling(500);
-
-    return () => stopPolling();
-  }, [user]);
-
-  const shoppingLists = data?.shoppingListsByUser;
-
   return (
-    <SafeAreaView style={styles.container}>
+    <DefaultSafeAreaContainer>
       <FlatList
         refreshing={loading}
         onRefresh={refetch}
-        data={shoppingLists}
+        data={openShoppingLists}
         renderItem={({ item }) => {
           return <ShoppingListItem shoppingList={item} />;
         }}
@@ -44,7 +32,7 @@ function MyListsScreen({ navigation }: DefaultScreenProp) {
       <FloatingButton
         action={() => navigation.navigate("CreateShoppingList")}
       />
-    </SafeAreaView>
+    </DefaultSafeAreaContainer>
   );
 }
 

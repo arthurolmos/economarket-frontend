@@ -5,6 +5,8 @@ export const GET_SHOPPING_LISTS_BY_USER = gql`
     shoppingListsByUser(userId: $userId) {
       id
       name
+      date
+      done
       user {
         id
         firstName

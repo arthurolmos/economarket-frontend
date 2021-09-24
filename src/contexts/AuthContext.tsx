@@ -5,7 +5,7 @@ import { useQuery } from "@apollo/client";
 import { WHO_AM_I } from "../apollo/graphql";
 
 interface Props {
-  children: React.ReactElement;
+  children: React.ReactElement[] | React.ReactElement;
 }
 
 interface IContext {
@@ -26,10 +26,9 @@ export function AuthProvider({ children }: Props) {
 
   React.useEffect(() => {
     if (signedUser) {
-      console.log(signedUser);
       setUser(signedUser);
     }
-  }, [data]);
+  }, [signedUser]);
 
   const signIn = async (access_token: string, user: any) => {
     await storage.save("access_token", access_token);

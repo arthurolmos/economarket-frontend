@@ -3,8 +3,8 @@ import React from "react";
 import { CREATE_PRODUCT } from "../../apollo/graphql";
 import { AuthContext } from "../../contexts";
 import { Product } from "../../interfaces/product";
-import { DefaultInput } from "../Inputs";
-import { showToast } from "../Toast";
+import { DefaultInput } from "../inputs";
+import { showToast } from "../toast";
 import { DefaultModalLayout } from "./DefaultModalLayout";
 
 interface Props {
@@ -59,28 +59,22 @@ export function CreateProductModal(props: Props) {
       submit={submit}
       title="Criar produto"
     >
-      <>
-        <DefaultInput value={name} onChangeText={setName} placeholder="Nome" />
+      <DefaultInput value={name} onChangeText={setName} placeholder="Nome" />
 
-        <DefaultInput
-          placeholder="Preço Unitário"
-          value={price}
-          onChangeText={setPrice}
-          keyboardType="numeric"
-        />
+      <DefaultInput
+        placeholder="Preço Unitário"
+        value={price}
+        onChangeText={setPrice}
+        keyboardType="numeric"
+      />
 
-        <DefaultInput
-          value={brand}
-          onChangeText={setBrand}
-          placeholder="Marca"
-        />
+      <DefaultInput value={brand} onChangeText={setBrand} placeholder="Marca" />
 
-        <DefaultInput
-          value={market}
-          onChangeText={setMarket}
-          placeholder="Mercado"
-        />
-      </>
+      <DefaultInput
+        value={market}
+        onChangeText={setMarket}
+        placeholder="Mercado"
+      />
     </DefaultModalLayout>
   );
 }

@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "948983969808",
+    "project_id": "economarket-6d7c5",
+    "storage_bucket": "economarket-6d7c5.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:948983969808:android:9a5ecb9c1333a8f579b295",
+        "android_client_info": {
+          "package_name": "com.arthurolmos.economarket"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "948983969808-5hfnb0c3marr0h9mt2lf0dk6c79vktii.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBWEgS2kVblKVmwbR_jE4TGbJfgZKD7tb0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "948983969808-5hfnb0c3marr0h9mt2lf0dk6c79vktii.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -9,12 +9,12 @@ import {
 import { AuthContext } from "../contexts/AuthContext";
 import DefaultScreenProp from "../interfaces/navigation/DefaultScreenProp";
 import { useMutation } from "@apollo/client";
-import { showToast } from "../components/Toast";
+import { showToast } from "../components/toast";
 import { REGISTER } from "../apollo/graphql";
-import { DefaultInput } from "../components/Inputs";
+import { DefaultInput } from "../components/inputs";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { UserCreateInput } from "../interfaces/user";
-import DefaultButton from "../components/Buttons/DefaultButton";
+import DefaultButton from "../components/buttons/DefaultButton";
 import { validateRegister } from "../lib/validations";
 
 function RegisterScreen({ navigation }: DefaultScreenProp) {
@@ -81,7 +81,7 @@ function RegisterScreen({ navigation }: DefaultScreenProp) {
       />
       <View>
         {loading ? (
-          <ActivityIndicator size="large" color="green" />
+          <ActivityIndicator size="large" color="lightgreen" />
         ) : (
           <>
             <View style={{ marginBottom: 15, marginTop: 15 }}>

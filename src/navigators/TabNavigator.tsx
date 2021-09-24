@@ -4,20 +4,26 @@ import ProductsScreen from "../screens/ProductsScreen";
 import MyListsScreen from "../screens/MyListsScreen";
 import HomeScreen from "../screens/HomeScreen";
 import SettingsScreen from "../screens/SettingsScreen";
-import { Ionicons } from "@expo/vector-icons";
+import { TabNavigatorIcon } from "../components/icons/TabNavigatorIcon";
 
 const Tab = createBottomTabNavigator();
 
 function TabNavigator() {
   return (
-    <Tab.Navigator>
+    <Tab.Navigator
+      screenOptions={{
+        headerShown: false,
+        tabBarActiveTintColor: "lightgray",
+        tabBarInactiveTintColor: "gray",
+      }}
+    >
       <Tab.Screen
         name="Home"
         component={HomeScreen}
         options={{
           tabBarLabel: "Meu Painel",
           tabBarIcon: ({ focused, color, size }) => (
-            <Ionicons name="home" size={28} color={focused ? "blue" : "gray"} />
+            <TabNavigatorIcon name="home" focused={focused} />
           ),
         }}
       />
@@ -27,7 +33,7 @@ function TabNavigator() {
         options={{
           tabBarLabel: "Minhas Listas",
           tabBarIcon: ({ focused, color, size }) => (
-            <Ionicons name="cart" size={28} color={focused ? "blue" : "gray"} />
+            <TabNavigatorIcon name="cart" focused={focused} />
           ),
         }}
       />
@@ -37,7 +43,7 @@ function TabNavigator() {
         options={{
           tabBarLabel: "Produtos",
           tabBarIcon: ({ focused, color, size }) => (
-            <Ionicons name="cash" size={28} color={focused ? "blue" : "gray"} />
+            <TabNavigatorIcon name="star" focused={focused} />
           ),
         }}
       />
@@ -47,7 +53,7 @@ function TabNavigator() {
         options={{
           tabBarLabel: "Configurações",
           tabBarIcon: ({ focused, color, size }) => (
-            <Ionicons name="cog" size={28} color={focused ? "blue" : "gray"} />
+            <TabNavigatorIcon name="cog" focused={focused} />
           ),
         }}
       />

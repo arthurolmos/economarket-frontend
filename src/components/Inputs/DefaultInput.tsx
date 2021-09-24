@@ -14,6 +14,7 @@ export const DefaultInput = React.forwardRef(
 const styles = StyleSheet.create({
   input: {
     borderWidth: 1,
+    borderColor: "gray",
     marginTop: 15,
     marginBottom: 15,
     padding: 5,

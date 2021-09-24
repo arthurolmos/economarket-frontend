@@ -2,8 +2,8 @@ import { useMutation, useQuery } from "@apollo/client";
 import React from "react";
 import { ActivityIndicator, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { DefaultInput } from "../components/Inputs";
-import { showToast } from "../components/Toast";
+import { DefaultInput } from "../components/inputs";
+import { showToast } from "../components/toast";
 import {
   GET_LIST_PRODUCT_BY_SHOPPING_LIST,
   GET_SHOPPING_LIST,
@@ -11,7 +11,7 @@ import {
 } from "../apollo/graphql";
 import { ListProductUpdateInput } from "../interfaces/listProduct";
 import ParamScreenProp from "../interfaces/navigation/ParamScreenProp";
-import DefaultButton from "../components/Buttons/DefaultButton";
+import DefaultButton from "../components/buttons/DefaultButton";
 
 function EditListProductScreen({
   navigation,
@@ -92,7 +92,7 @@ function EditListProductScreen({
   return (
     <SafeAreaView style={styles.container}>
       {loading ? (
-        <ActivityIndicator size="large" color="green" />
+        <ActivityIndicator size="large" color="lightgreen" />
       ) : (
         <>
           <DefaultInput
@@ -123,7 +123,7 @@ function EditListProductScreen({
             placeholder="Mercado"
           />
           {updateListProductResult.loading ? (
-            <ActivityIndicator size="large" color="green" />
+            <ActivityIndicator size="large" color="lightgreen" />
           ) : (
             <DefaultButton
               title="Atualizar"
