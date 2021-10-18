@@ -2,6 +2,7 @@ import React from "react";
 import { Text, TouchableOpacity, StyleSheet, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { NotificationsContext } from "../../contexts";
+import { Notification } from "../../interfaces/notification";
 
 interface Props {
   action: () => void;
@@ -13,7 +14,7 @@ export function NotificationButton(props: Props) {
   const { notifications } = React.useContext(NotificationsContext);
 
   const notificationsUnread = notifications
-    ? notifications.filter((notification) => !!!notification.read)
+    ? notifications.filter((notification: Notification) => !!!notification.read)
     : [];
 
   return (

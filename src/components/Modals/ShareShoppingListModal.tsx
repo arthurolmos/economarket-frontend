@@ -3,6 +3,7 @@ import React from "react";
 import { CREATE_NOTIFICATION } from "../../apollo/graphql";
 import { AuthContext } from "../../contexts";
 import { ShoppingList } from "../../interfaces/shoppingList";
+import { validate } from "../../lib/validations";
 import { DefaultInput } from "../inputs";
 import { showToast } from "../toast";
 import { DefaultModalLayout } from "./DefaultModalLayout";
@@ -23,7 +24,9 @@ export function ShareShoppingListModal(props: Props) {
   const [createNotification, { loading }] = useMutation(CREATE_NOTIFICATION);
   async function submit() {
     try {
-      if (email === "") throw new Error("Preencha os dados corretamente!");
+      if (!validate(email)) throw new Error("Preencha os dados corretamente!");
+
+      if (email === user.email) return;
 
       const input = {
         shoppingListId: shoppingList.id,

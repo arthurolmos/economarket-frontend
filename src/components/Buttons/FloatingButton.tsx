@@ -19,10 +19,10 @@ export function FloatingButton(props: Props) {
 const styles = StyleSheet.create({
   container: {
     position: "absolute",
-    bottom: 20,
+    bottom: 80,
     right: 20,
     padding: 10,
-    backgroundColor: "violet",
+    backgroundColor: "purple",
     elevation: 5,
     width: 60,
     height: 60,

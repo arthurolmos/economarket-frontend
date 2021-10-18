@@ -14,12 +14,12 @@ import {
   UPDATE_LIST_PRODUCT,
   CREATE_PRODUCT,
 } from "../../apollo/graphql";
-import { ListProduct } from "../../interfaces/listProduct";
+import { ListProduct } from "../../interfaces/list-product";
 import { showToast } from "../toast";
 import { Swipeable } from "react-native-gesture-handler";
-import { Ionicons } from "@expo/vector-icons";
 import { Product } from "../../interfaces/product";
 import ScreenNavigationProp from "../../interfaces/navigation/ScreenNavigationProp";
+import { DefaultIcon } from "../icons";
 
 interface Props {
   product: ListProduct;
@@ -39,7 +39,7 @@ export function ListProductListItem(props: Props) {
     refetchQueries: [
       {
         query: GET_SHOPPING_LIST,
-        variables: { id: product.shoppingList.id },
+        variables: { id: product.shoppingList?.id },
       },
     ],
   });
@@ -47,7 +47,7 @@ export function ListProductListItem(props: Props) {
   async function deleteListProduct() {
     try {
       await doDeleteListProduct({
-        variables: { id: product.id, shoppingListId: product.shoppingList.id },
+        variables: { id: product.id, shoppingListId: product.shoppingList?.id },
       });
 
       showToast("Produto removido com sucesso!");
@@ -67,7 +67,7 @@ export function ListProductListItem(props: Props) {
 
       await doPurchaseListProduct({
         variables: {
-          shoppingListId: product.shoppingList.id,
+          shoppingListId: product.shoppingList?.id,
           values: values,
           id: product.id,
         },
@@ -95,7 +95,7 @@ export function ListProductListItem(props: Props) {
         {deleting.loading ? (
           <ActivityIndicator size="small" color="lightpink" />
         ) : (
-          <Ionicons name="trash" size={32} color="lightpink" />
+          <DefaultIcon name="trash" size={32} color="lightpink" />
         )}
       </TouchableOpacity>
     );
@@ -120,9 +120,9 @@ export function ListProductListItem(props: Props) {
         ) : (
           <Text>
             {product.purchased ? (
-              <Ionicons name="close" size={32} color="blue" />
+              <DefaultIcon name="close" size={32} color="blue" />
             ) : (
-              <Ionicons name="cart" size={32} color="green" />
+              <DefaultIcon name="cart" size={32} color="green" />
             )}
           </Text>
         )}
@@ -148,7 +148,7 @@ export function ListProductListItem(props: Props) {
       >
         <View style={{ display: "flex", flex: 1 }}>
           <Text style={styles.productName}>{product.name}</Text>
-          <Text>R$ {product.price.toFixed(2)}</Text>
+          <Text>R$ {product.price?.toFixed(2)}</Text>
           <Text>Qtd: {product.quantity}</Text>
           <Text>Total: R$ {totalPrice.toFixed(2)}</Text>
         </View>
@@ -157,15 +157,15 @@ export function ListProductListItem(props: Props) {
             onPress={() =>
               navigation.navigate("EditListProduct", {
                 id: product.id,
-                shoppingListId: product.shoppingList.id,
+                shoppingListId: product.shoppingList?.id,
               })
             }
           >
-            <Ionicons name="create" size={32} color="gray" />
+            <DefaultIcon name="create" size={32} color="gray" />
           </TouchableOpacity>
 
           <TouchableOpacity onPress={() => openModal(product)}>
-            <Ionicons name="star" size={32} color="gray" />
+            <DefaultIcon name="star" size={32} color="gray" />
           </TouchableOpacity>
         </View>
       </View>

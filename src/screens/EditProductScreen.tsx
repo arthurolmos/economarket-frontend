@@ -9,7 +9,7 @@ import {
   GET_PRODUCTS_BY_USER,
   UPDATE_PRODUCT,
 } from "../apollo/graphql";
-import { ListProductUpdateInput } from "../interfaces/listProduct";
+import { ListProductUpdateInput } from "../interfaces/list-product";
 import ParamScreenProp from "../interfaces/navigation/ParamScreenProp";
 import DefaultButton from "../components/buttons/DefaultButton";
 import { AuthContext } from "../contexts";
@@ -26,14 +26,15 @@ function EditProductScreen({
     GET_PRODUCT,
     {
       variables: { id },
+      fetchPolicy: "network-only",
     }
   );
 
-  React.useEffect(() => {
-    startPolling(500);
+  // React.useEffect(() => {
+  //   startPolling(1000);
 
-    return () => stopPolling();
-  }, []);
+  //   return () => stopPolling();
+  // }, []);
 
   const product = data?.product;
   if (error) console.log(error);

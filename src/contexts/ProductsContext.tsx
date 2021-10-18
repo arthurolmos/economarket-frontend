@@ -28,10 +28,10 @@ export function ProductsProvider({ children }: Props) {
   const products = data?.productsByUser ? data?.productsByUser : [];
 
   React.useEffect(() => {
-    startPolling(500);
+    if (user) startPolling(1000);
 
     return () => stopPolling();
-  }, []);
+  }, [user]);
 
   return (
     <ProductsContext.Provider

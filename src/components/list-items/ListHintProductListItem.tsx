@@ -1,6 +1,6 @@
 import React from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
-import { ListProduct } from "../../interfaces/listProduct";
+import { ListProduct } from "../../interfaces/list-product";
 
 interface Props {
   product: Partial<ListProduct>;

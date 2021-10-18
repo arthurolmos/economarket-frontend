@@ -55,15 +55,15 @@ function ShoppingListScreen({
 
   const [modalProduct, setModalProduct] =
     React.useState<Partial<Product> | null>(null);
-  const [addProductModalVisible, setFavProductModalVisible] =
+  const [addProductModalVisible, setAddProductModalVisible] =
     React.useState(false);
-  const openFavProductModal = (product: Partial<Product>) => {
+  const openAddProductModal = (product: Partial<Product>) => {
     setModalProduct(product);
-    setFavProductModalVisible(true);
+    setAddProductModalVisible(true);
   };
-  const closeFavProductModal = () => {
+  const closeAddProductModal = () => {
     setModalProduct(null);
-    setFavProductModalVisible(false);
+    setAddProductModalVisible(false);
   };
   const [name, setName] = React.useState("");
   const [quantity, setQuantity] = React.useState("");
@@ -88,6 +88,9 @@ function ShoppingListScreen({
 
     return () => stopPolling();
   }, [user]);
+
+  if (getShoppingListResult.data) console.log(getShoppingListResult.data);
+  if (getShoppingListResult.error) console.log(getShoppingListResult.error);
 
   const shoppingList: ShoppingList =
     getShoppingListResult.data?.shoppingListByUser;
@@ -190,6 +193,7 @@ function ShoppingListScreen({
           </View>
 
           <View style={{ display: "flex" }}>
+            {/* <Text>{sharedWith}</Text> */}
             <Text>TOTAL: R$ {shoppingList?.totalPrice.toFixed(2)}</Text>
             <Text>
               Produtos: {purchasedListItemsTotal} / {listProductsTotal}
@@ -198,83 +202,65 @@ function ShoppingListScreen({
         </View>
 
         <View style={styles.inputContainer}>
-          <View style={{ display: "flex", flexDirection: "row" }}>
-            <View style={{ display: "flex", flex: 1 }}>
-              <DefaultSubtitle>Adicionar Produtos</DefaultSubtitle>
+          <DefaultSubtitle>Adicionar Produtos</DefaultSubtitle>
+
+          <DefaultInput
+            value={name}
+            onChangeText={(text: string) => {
+              setName(text);
+              getHints(text);
+            }}
+            placeholder="Nome"
+          />
+          {hints?.length > 0 && (
+            <View style={styles.hintContainer}>
+              <View
+                style={{
+                  display: "flex",
+                  alignItems: "flex-end",
+                }}
+              >
+                <TouchableOpacity onPress={clearHints}>
+                  <DefaultIcon name="close" size={20} />
+                </TouchableOpacity>
+              </View>
+              <FlatList
+                data={hints}
+                renderItem={({ item }: { item: Product }) => {
+                  return (
+                    <ListHintProductListItem
+                      product={item}
+                      action={fillProduct}
+                    />
+                  );
+                }}
+                keyExtractor={(item: Product) => item.id}
+                ItemSeparatorComponent={() => <View style={styles.separator} />}
+              />
             </View>
-            <View
-              style={{
-                display: "flex",
-                flex: 1,
-                alignItems: "flex-end",
-                paddingRight: 5,
-              }}
-            >
-              <TouchableOpacity onPress={toggle}>
-                <DefaultIcon name={isOpen ? "caret-down" : "caret-down"} />
-              </TouchableOpacity>
+          )}
+
+          <View style={styles.inputRow}>
+            <View style={styles.inputRight}>
+              <DefaultInput
+                placeholder="Quantidade"
+                value={quantity}
+                onChangeText={setQuantity}
+                keyboardType="numeric"
+                ref={quantityInputRef}
+              />
+            </View>
+            <View style={styles.inputLeft}>
+              <DefaultInput
+                placeholder="Preço Unitário"
+                value={price}
+                onChangeText={setPrice}
+                keyboardType="numeric"
+              />
             </View>
           </View>
-
           {isOpen && (
             <>
-              <DefaultInput
-                value={name}
-                onChangeText={(text: string) => {
-                  setName(text);
-                  getHints(text);
-                }}
-                placeholder="Nome"
-              />
-              {hints?.length > 0 && (
-                <View style={styles.hintContainer}>
-                  <View
-                    style={{
-                      display: "flex",
-                      alignItems: "flex-end",
-                    }}
-                  >
-                    <TouchableOpacity onPress={clearHints}>
-                      <DefaultIcon name="close" size={20} />
-                    </TouchableOpacity>
-                  </View>
-                  <FlatList
-                    data={hints}
-                    renderItem={({ item }: { item: Product }) => {
-                      return (
-                        <ListHintProductListItem
-                          product={item}
-                          action={fillProduct}
-                        />
-                      );
-                    }}
-                    keyExtractor={(item: Product) => item.id}
-                    ItemSeparatorComponent={() => (
-                      <View style={styles.separator} />
-                    )}
-                  />
-                </View>
-              )}
-
-              <View style={styles.inputRow}>
-                <View style={styles.inputRight}>
-                  <DefaultInput
-                    placeholder="Quantidade"
-                    value={quantity}
-                    onChangeText={setQuantity}
-                    keyboardType="numeric"
-                    ref={quantityInputRef}
-                  />
-                </View>
-                <View style={styles.inputLeft}>
-                  <DefaultInput
-                    placeholder="Preço Unitário"
-                    value={price}
-                    onChangeText={setPrice}
-                    keyboardType="numeric"
-                  />
-                </View>
-              </View>
               <DefaultInput
                 value={brand}
                 onChangeText={setBrand}
@@ -286,7 +272,16 @@ function ShoppingListScreen({
                 onChangeText={setMarket}
                 placeholder="Mercado"
               />
+            </>
+          )}
+          <View style={styles.inputRow}>
+            <View style={styles.inputRight}>
+              <TouchableOpacity onPress={toggle} style={styles.toggleButton}>
+                <Text>{isOpen ? "...Menos" : "Mais..."}</Text>
+              </TouchableOpacity>
+            </View>
 
+            <View style={styles.inputLeft}>
               {createListProductResult.loading ? (
                 <ActivityIndicator size="small" color="lightgreen" />
               ) : (
@@ -297,11 +292,11 @@ function ShoppingListScreen({
                   }}
                   style={styles.addButton}
                 >
-                  <Text style={{ color: "green" }}>Adicionar</Text>
+                  <Text style={{ color: "green" }}>Add</Text>
                 </TouchableOpacity>
               )}
-            </>
-          )}
+            </View>
+          </View>
         </View>
       </View>
 
@@ -314,7 +309,7 @@ function ShoppingListScreen({
           return (
             <ListProductListItem
               product={product}
-              openModal={openFavProductModal}
+              openModal={openAddProductModal}
             />
           );
         }}
@@ -336,7 +331,7 @@ function ShoppingListScreen({
 
       <CreateProductModal
         isOpen={addProductModalVisible}
-        close={closeFavProductModal}
+        close={closeAddProductModal}
         product={modalProduct}
       />
     </DefaultSafeAreaContainer>

@@ -30,10 +30,10 @@ export function ShoppingListsProvider({ children }: Props) {
     : [];
 
   React.useEffect(() => {
-    startPolling(500);
+    if (user) startPolling(1000);
 
     return () => stopPolling();
-  }, []);
+  }, [user]);
 
   return (
     <ShoppingListsContext.Provider

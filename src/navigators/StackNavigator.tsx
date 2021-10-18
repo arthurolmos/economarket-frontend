@@ -5,14 +5,14 @@ import { AuthContext } from "../contexts/AuthContext";
 import RootStackParamList from "../interfaces/navigation/RootStackParamList";
 import LoginScreen from "../screens/LoginScreen";
 import RegisterScreen from "../screens/RegisterScreen";
-import TabNavigator from "./TabNavigator";
 import CreateShoppingListScreen from "../screens/CreateShoppingListScreen";
-import ShoppingListScreen from "../screens/ShoppingListScreen";
-import EditListProductScreen from "../screens/EditListProdutScreen";
+import ShoppingListScreen from "../screens/shopping-list-screen/ShoppingListScreen";
+import EditListProductScreen from "../screens/EditListProductScreen";
 import { NotificationButton } from "../components/buttons";
 import NotificationsScreen from "../screens/NotificationsScreen";
 import { navigationRef } from "./RootNavigation";
 import EditProductScreen from "../screens/EditProductScreen";
+import TabNavigatorScreen from "../screens/TabNavigatorScreen";
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -23,7 +23,7 @@ function StackNavigator() {
     <NavigationContainer ref={navigationRef}>
       <Stack.Navigator
         initialRouteName="Home"
-        screenOptions={({ navigation }) => ({
+        screenOptions={({ navigation }: any) => ({
           headerRight: () => (
             <NotificationButton
               action={() => navigation.navigate("Notifications")}
@@ -51,8 +51,8 @@ function StackNavigator() {
           <>
             <Stack.Screen
               name="TabNavigator"
-              component={TabNavigator}
-              options={{ title: "economarket" }}
+              component={TabNavigatorScreen}
+              options={{ title: "iMarket" }}
             />
             <Stack.Screen
               name="CreateShoppingList"

@@ -9,7 +9,7 @@ import {
   GET_SHOPPING_LIST,
   UPDATE_LIST_PRODUCT,
 } from "../apollo/graphql";
-import { ListProductUpdateInput } from "../interfaces/listProduct";
+import { ListProductUpdateInput } from "../interfaces/list-product";
 import ParamScreenProp from "../interfaces/navigation/ParamScreenProp";
 import DefaultButton from "../components/buttons/DefaultButton";
 
@@ -24,14 +24,15 @@ function EditListProductScreen({
     GET_LIST_PRODUCT_BY_SHOPPING_LIST,
     {
       variables: { id, shoppingListId },
+      fetchPolicy: "network-only",
     }
   );
 
-  React.useEffect(() => {
-    startPolling(500);
+  // React.useEffect(() => {
+  //   startPolling(1000);
 
-    return () => stopPolling();
-  }, []);
+  //   return () => stopPolling();
+  // }, []);
 
   const product = data?.listProductByShoppingList;
 

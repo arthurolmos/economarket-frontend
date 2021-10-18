@@ -15,7 +15,7 @@ import { DefaultInput } from "../components/inputs";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { UserCreateInput } from "../interfaces/user";
 import DefaultButton from "../components/buttons/DefaultButton";
-import { validateRegister } from "../lib/validations";
+import { validate } from "../lib/validations";
 
 function RegisterScreen({ navigation }: DefaultScreenProp) {
   const { signIn } = React.useContext(AuthContext);
@@ -38,8 +38,7 @@ function RegisterScreen({ navigation }: DefaultScreenProp) {
         password,
       };
 
-      if (!validateRegister(input))
-        throw new Error("Preencha todos os campos!");
+      if (!validate(input)) throw new Error("Preencha todos os campos!");
 
       const { data } = await register({ variables: { data: input } });
 
@@ -54,59 +53,64 @@ function RegisterScreen({ navigation }: DefaultScreenProp) {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={{ textTransform: "uppercase", margin: 25, fontSize: 30 }}>
-        Register
-      </Text>
-      <DefaultInput
-        value={firstName}
-        onChangeText={setFirstName}
-        placeholder="Nome"
-      />
-      <DefaultInput
-        value={lastName}
-        onChangeText={setLastName}
-        placeholder="Sobrenome"
-      />
-      <DefaultInput
-        value={email}
-        onChangeText={setEmail}
-        placeholder="Email"
-        keyboardType="email-address"
-        autoCapitalize="none"
-      />
-      <DefaultInput
-        value={password}
-        onChangeText={setPassword}
-        placeholder="Senha"
-      />
-      <View>
-        {loading ? (
-          <ActivityIndicator size="large" color="lightgreen" />
-        ) : (
-          <>
-            <View style={{ marginBottom: 15, marginTop: 15 }}>
-              <DefaultButton
-                title="Criar conta"
-                action={submit}
-                color="white"
-                bgColor="lightgreen"
-              />
-            </View>
+      <View style={styles.titleContainer}>
+        <Text style={styles.title}>iMarket</Text>
+      </View>
+      <View style={styles.fieldContainer}>
+        <Text style={{ textTransform: "uppercase", fontSize: 20 }}>
+          Register
+        </Text>
+        <DefaultInput
+          value={firstName}
+          onChangeText={setFirstName}
+          placeholder="Nome"
+        />
+        <DefaultInput
+          value={lastName}
+          onChangeText={setLastName}
+          placeholder="Sobrenome"
+        />
+        <DefaultInput
+          value={email}
+          onChangeText={setEmail}
+          placeholder="Email"
+          keyboardType="email-address"
+          autoCapitalize="none"
+        />
+        <DefaultInput
+          value={password}
+          onChangeText={setPassword}
+          placeholder="Senha"
+        />
+        <View>
+          {loading ? (
+            <ActivityIndicator size="large" color="lightgreen" />
+          ) : (
+            <>
+              <View style={{ marginBottom: 15, marginTop: 15 }}>
+                <DefaultButton
+                  title="Criar conta"
+                  action={submit}
+                  color="white"
+                  bgColor="lightgreen"
+                />
+              </View>
 
-            <TouchableOpacity
-              style={{
-                marginBottom: 15,
-                marginTop: 15,
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-              onPress={() => navigation.navigate("Login")}
-            >
-              <Text>Fazer login!</Text>
-            </TouchableOpacity>
-          </>
-        )}
+              <TouchableOpacity
+                style={{
+                  marginBottom: 15,
+                  marginTop: 15,
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+                onPress={() => navigation.navigate("Login")}
+              >
+                <Text>Fazer login!</Text>
+              </TouchableOpacity>
+            </>
+          )}
+        </View>
       </View>
     </SafeAreaView>
   );
@@ -119,5 +123,19 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     padding: 15,
+  },
+  titleContainer: {
+    display: "flex",
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  title: {
+    fontSize: 32,
+  },
+  fieldContainer: {
+    display: "flex",
+    flex: 3,
+    justifyContent: "center",
   },
 });

@@ -7,9 +7,8 @@ import {
   GET_NOTIFICATIONS_BY_USER,
 } from "../apollo/graphql";
 import { Notification } from "../interfaces/notification";
-import "../config/notifications/register";
-import { addNotificationListeners } from "../config/notifications";
-import { getToken } from "../lib/notifications/getToken";
+import "../notifications/register";
+import { addNotificationListeners, getToken } from "../notifications";
 
 interface Props {
   children: React.ReactElement[] | React.ReactElement;
@@ -44,10 +43,15 @@ export function NotificationsProvider({ children }: Props) {
   }, []);
 
   React.useEffect(() => {
-    startPolling(500);
+    if (user) {
+      startPolling(1000);
+      registerNotificationToken(user.id);
+    } else {
+      unregisterNotificationToken();
+    }
 
     return () => stopPolling();
-  }, []);
+  }, [user]);
 
   const [createPushNotificationToken] = useMutation(
     CREATE_PUSH_NOTIFICATION_TOKEN
@@ -89,14 +93,6 @@ export function NotificationsProvider({ children }: Props) {
       console.log("Error deleting notification token", err);
     }
   }
-
-  React.useEffect(() => {
-    if (user) {
-      registerNotificationToken(user.id);
-    } else {
-      unregisterNotificationToken();
-    }
-  }, [user]);
 
   return (
     <NotificationsContext.Provider

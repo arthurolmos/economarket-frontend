@@ -1,4 +1,4 @@
-import { ListProduct } from "../listProduct";
+import { ListProduct } from "../list-product";
 import { User } from "../user";
 
 export interface ShoppingList {

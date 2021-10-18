@@ -7,6 +7,7 @@ import {
   NotificationListItem,
 } from "../components/list-items";
 import { DefaultSafeAreaContainer } from "../components/layout/DefaultSafeAreaContainer";
+import { Notification } from "../interfaces/notification";
 
 function NotificationsScreen({ navigation }: DefaultScreenProp) {
   const { notifications, loading, refetch } =
@@ -18,10 +19,10 @@ function NotificationsScreen({ navigation }: DefaultScreenProp) {
         refreshing={loading}
         onRefresh={refetch}
         data={notifications}
-        renderItem={({ item }) => {
+        renderItem={({ item }: { item: Notification }) => {
           return <NotificationListItem notification={item} />;
         }}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item: Notification) => item.id}
         ListEmptyComponent={() => <EmptyListComponent loading={loading} />}
         ItemSeparatorComponent={() => <View style={styles.separator} />}
       />

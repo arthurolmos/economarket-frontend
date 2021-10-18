@@ -1,4 +1,4 @@
-import gql from "graphql-tag";
+import { gql } from "@apollo/client";
 
 export const WHO_AM_I = gql`
   query WhoAmI {
@@ -6,6 +6,7 @@ export const WHO_AM_I = gql`
       id
       firstName
       lastName
+      email
       fullName @client
     }
   }

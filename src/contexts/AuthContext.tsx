@@ -1,7 +1,7 @@
 import React from "react";
 import { User } from "../interfaces/user";
 import storage from "../storage";
-import { useQuery } from "@apollo/client";
+import { useLazyQuery, useQuery } from "@apollo/client";
 import { WHO_AM_I } from "../apollo/graphql";
 
 interface Props {
@@ -19,10 +19,15 @@ export const AuthContext = React.createContext({} as IContext);
 export function AuthProvider({ children }: Props) {
   const [user, setUser] = React.useState<User | null>(null);
 
-  const { loading, data } = useQuery(WHO_AM_I, {
+  const [getSignedUser, { loading, data, error }] = useLazyQuery(WHO_AM_I, {
     fetchPolicy: "no-cache",
   });
+
   const signedUser = data?.whoAmI;
+
+  React.useEffect(() => {
+    getSignedUser();
+  }, []);
 
   React.useEffect(() => {
     if (signedUser) {
@@ -32,11 +37,13 @@ export function AuthProvider({ children }: Props) {
 
   const signIn = async (access_token: string, user: any) => {
     await storage.save("access_token", access_token);
+    await storage.save("username", user.email);
     setUser(user);
   };
 
   const signOut = async () => {
     await storage.del("access_token");
+    await storage.del("username");
     setUser(null);
   };
 

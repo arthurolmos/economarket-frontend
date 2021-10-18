@@ -1,13 +1,13 @@
 import { ApolloClient, HttpLink, InMemoryCache, split } from "@apollo/client";
 import * as Constants from "expo-constants";
-import { ListProduct } from "../../interfaces/listProduct";
+import { ListProduct } from "../../interfaces/list-product";
 import { WebSocketLink } from "@apollo/client/link/ws";
 import { getMainDefinition } from "@apollo/client/utilities";
 import { setContext } from "@apollo/client/link/context";
 import storage from "../../storage";
 
 const httpURI =
-  process.env.NODE_ENV === "development"
+  process.env.NODE_ENV == "development"
     ? "http://" +
       Constants.default.manifest?.debuggerHost
         .split(`:`)
@@ -16,7 +16,7 @@ const httpURI =
     : "https://economarket.herokuapp.com/graphql";
 
 const wsURI =
-  process.env.NODE_ENV === "development"
+  process.env.NODE_ENV == "development"
     ? "ws://" +
       Constants.default.manifest?.debuggerHost
         .split(`:`)

@@ -57,10 +57,6 @@ function HomeScreen({ navigation }: DefaultScreenProp) {
           );
         }}
       />
-
-      <FloatingButton
-        action={() => navigation.navigate("CreateShoppingList")}
-      />
     </DefaultSafeAreaContainer>
   );
 }

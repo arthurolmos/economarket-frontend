@@ -1,6 +1,20 @@
+import { useMutation } from "@apollo/client";
 import React from "react";
-import { Text, View, StyleSheet } from "react-native";
+import {
+  Text,
+  View,
+  StyleSheet,
+  Button,
+  ActivityIndicator,
+} from "react-native";
+import {
+  DELETE_SHOPPING_LIST,
+  GET_SHOPPING_LISTS_BY_USER,
+  RESTORE_SHOPPING_LIST,
+} from "../../apollo/graphql";
+import { AuthContext } from "../../contexts";
 import { ShoppingList } from "../../interfaces/shoppingList";
+import { showToast } from "../toast";
 
 interface Props {
   item: ShoppingList;
@@ -8,6 +22,11 @@ interface Props {
 
 export function TotalListItem(props: Props) {
   const { item } = props;
+
+  const { user } = React.useContext(AuthContext);
+
+  const [consider, setConsider] = React.useState(true);
+  const toggle = () => setConsider(!consider);
 
   const date = new Date(item.date);
   function pad(n: number) {
@@ -19,18 +38,88 @@ export function TotalListItem(props: Props) {
     pad(date.getFullYear()),
   ].join("/");
 
+  const [doDeleteShoppingList, deletingShoppingList] = useMutation(
+    DELETE_SHOPPING_LIST,
+    {
+      refetchQueries: [
+        {
+          query: GET_SHOPPING_LISTS_BY_USER,
+          variables: { userId: user?.id },
+        },
+      ],
+    }
+  );
+
+  async function deleteShoppingList() {
+    try {
+      await doDeleteShoppingList({
+        variables: { id: item.id, userId: user?.id },
+      });
+
+      showToast("Lista excluída com sucesso!");
+    } catch (err) {
+      console.log("Error on deleting Shopping List!", err);
+    }
+  }
+
+  const [doRestoreShoppingList, restoreingShoppingList] = useMutation(
+    RESTORE_SHOPPING_LIST,
+    {
+      refetchQueries: [
+        {
+          query: GET_SHOPPING_LISTS_BY_USER,
+          variables: { userId: user?.id },
+        },
+      ],
+    }
+  );
+
+  async function restoreShoppingList() {
+    try {
+      await doRestoreShoppingList({
+        variables: { id: item.id, userId: user?.id },
+      });
+
+      showToast("Lista reaberta com sucesso!");
+    } catch (err) {
+      console.log("Error on restore Shopping List!", err);
+    }
+  }
+
   return (
     <View style={styles.container}>
-      <View style={styles.date}>
-        <Text>{formattedDate}</Text>
+      <View style={{ display: "flex", marginBottom: 10 }}>
+        <View style={styles.date}>
+          <Text>{formattedDate}</Text>
+        </View>
+        <View style={styles.info}>
+          <View style={styles.title}>
+            <Text>{item.name}</Text>
+          </View>
+          <View style={styles.price}>
+            <Text>R$ {item.totalPrice.toFixed(2)}</Text>
+          </View>
+        </View>
       </View>
-      <View style={styles.info}>
-        <View style={styles.title}>
-          <Text>{item.name}</Text>
-        </View>
-        <View style={styles.price}>
-          <Text>R$ {item.totalPrice.toFixed(2)}</Text>
-        </View>
+
+      <View
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "space-between",
+        }}
+      >
+        {deletingShoppingList.loading ? (
+          <ActivityIndicator size="small" color="green" />
+        ) : (
+          <Button onPress={deleteShoppingList} title="Excluir" />
+        )}
+        {item.done &&
+          (restoreingShoppingList.loading ? (
+            <ActivityIndicator size="small" color="green" />
+          ) : (
+            <Button onPress={restoreShoppingList} title="Reabrir" />
+          ))}
       </View>
     </View>
   );
@@ -42,6 +131,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 5,
     padding: 5,
+    display: "flex",
+    flexDirection: "column",
   },
 
   date: {

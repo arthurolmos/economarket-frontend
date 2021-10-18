@@ -14,7 +14,8 @@ import { showToast } from "../components/toast";
 import { DefaultInput } from "../components/inputs";
 import { SafeAreaView } from "react-native-safe-area-context";
 import DefaultButton from "../components/buttons/DefaultButton";
-import { validateLogin } from "../lib/validations";
+import { validate } from "../lib/validations";
+import storage from "../storage";
 
 function LoginScreen({ navigation }: DefaultScreenProp) {
   const { signIn } = React.useContext(AuthContext);
@@ -28,7 +29,7 @@ function LoginScreen({ navigation }: DefaultScreenProp) {
 
   async function submit() {
     try {
-      if (!validateLogin({ username, password }))
+      if (!validate({ username, password }))
         throw new Error("Preencha os campos corretmente!");
 
       const { data } = await login({
@@ -37,6 +38,8 @@ function LoginScreen({ navigation }: DefaultScreenProp) {
 
       const { token, user } = data.login;
 
+      console.log({ user });
+
       signIn(token, user);
     } catch (err) {
       console.log("Error on Login!", err);
@@ -44,58 +47,72 @@ function LoginScreen({ navigation }: DefaultScreenProp) {
     }
   }
 
+  React.useEffect(() => {
+    getUsername();
+  }, []);
+
+  const getUsername = async () => {
+    const username = await storage.get("username");
+
+    if (username) setUsername(username);
+  };
+
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={{ textTransform: "uppercase", margin: 25, fontSize: 30 }}>
-        Login
-      </Text>
-      <DefaultInput
-        value={username}
-        onChangeText={setUsername}
-        placeholder="Email"
-        keyboardType="email-address"
-        autoCapitalize="none"
-      />
-      <DefaultInput
-        value={password}
-        onChangeText={setPassword}
-        placeholder="Senha"
-      />
-      <View
-        style={{
-          display: "flex",
-          justifyContent: "center",
-        }}
-      >
-        <>
-          {loading ? (
-            <ActivityIndicator size="large" color="lightgreen" />
-          ) : (
-            <>
-              <View style={{ marginBottom: 15, marginTop: 15 }}>
-                <DefaultButton
-                  title="Entrar"
-                  action={submit}
-                  color="lightgreen"
-                  bgColor="green"
-                />
-              </View>
+      <View style={styles.titleContainer}>
+        <Text style={styles.title}>iMarket</Text>
+      </View>
 
-              <TouchableOpacity
-                style={{
-                  marginBottom: 15,
-                  marginTop: 15,
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-                onPress={() => navigation.navigate("Register")}
-              >
-                <Text>Criar uma conta!</Text>
-              </TouchableOpacity>
-            </>
-          )}
-        </>
+      <View style={styles.fieldContainer}>
+        <Text style={{ textTransform: "uppercase", fontSize: 20 }}>Login</Text>
+        <DefaultInput
+          value={username}
+          onChangeText={setUsername}
+          placeholder="Email"
+          keyboardType="email-address"
+          autoCapitalize="none"
+        />
+        <DefaultInput
+          value={password}
+          onChangeText={setPassword}
+          placeholder="Senha"
+        />
+        <View
+          style={{
+            display: "flex",
+            justifyContent: "center",
+          }}
+        >
+          <>
+            {loading ? (
+              <ActivityIndicator size="large" color="lightgreen" />
+            ) : (
+              <>
+                <View style={{ marginBottom: 15, marginTop: 15 }}>
+                  <DefaultButton
+                    title="Entrar"
+                    action={submit}
+                    color="lightgreen"
+                    bgColor="green"
+                  />
+                </View>
+
+                <TouchableOpacity
+                  style={{
+                    marginBottom: 15,
+                    marginTop: 15,
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                  onPress={() => navigation.navigate("Register")}
+                >
+                  <Text>Criar uma conta!</Text>
+                </TouchableOpacity>
+              </>
+            )}
+          </>
+        </View>
       </View>
     </SafeAreaView>
   );
@@ -108,5 +125,20 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     padding: 15,
+    display: "flex",
+  },
+  titleContainer: {
+    display: "flex",
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  title: {
+    fontSize: 32,
+  },
+  fieldContainer: {
+    display: "flex",
+    flex: 3,
+    justifyContent: "center",
   },
 });

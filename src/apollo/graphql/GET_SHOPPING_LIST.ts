@@ -10,7 +10,6 @@ export const GET_SHOPPING_LIST = gql`
         firstName
         lastName
       }
-
       listProducts {
         id
         name

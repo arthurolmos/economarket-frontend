@@ -21,7 +21,7 @@ import {
 import { showToast } from "../toast";
 import ScreenNavigationProp from "../../interfaces/navigation/ScreenNavigationProp";
 import { Swipeable } from "react-native-gesture-handler";
-import { Ionicons } from "@expo/vector-icons";
+import { DefaultIcon } from "../icons";
 
 interface Props {
   shoppingList: ShoppingList;
@@ -122,7 +122,7 @@ export function ShoppingListItem(props: Props) {
         {deletingShoppingList.loading ? (
           <ActivityIndicator size="small" color="darkred" />
         ) : (
-          <Ionicons
+          <DefaultIcon
             name={shoppingList.isOwner ? "trash" : "exit"}
             size={32}
             color="pink"
@@ -144,9 +144,7 @@ export function ShoppingListItem(props: Props) {
         {finishingShoppingList.loading ? (
           <ActivityIndicator size="small" color="green" />
         ) : (
-          <Text>
-            <Ionicons name="checkmark" size={32} color="green" />
-          </Text>
+          <DefaultIcon name="checkmark" size={32} color="green" />
         )}
       </TouchableOpacity>
     );

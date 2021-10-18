@@ -1,5 +1,5 @@
 import * as Notifications from "expo-notifications";
-import * as RootNavigation from "../../navigators/RootNavigation";
+import * as RootNavigation from "../navigators/RootNavigation";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({

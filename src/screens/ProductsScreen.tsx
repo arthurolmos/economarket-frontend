@@ -5,6 +5,7 @@ import { FloatingButton } from "../components/buttons";
 import { EmptyListComponent, ProductListItem } from "../components/list-items";
 import { ProductsContext } from "../contexts";
 import { DefaultSafeAreaContainer } from "../components/layout/DefaultSafeAreaContainer";
+import { Product } from "../interfaces/product";
 
 function ProductsScreen({ navigation }: DefaultScreenProp) {
   const { products, refetch, loading } = React.useContext(ProductsContext);
@@ -15,17 +16,17 @@ function ProductsScreen({ navigation }: DefaultScreenProp) {
         refreshing={loading}
         onRefresh={refetch}
         data={products}
-        renderItem={({ item }) => {
+        renderItem={({ item }: { item: Product }) => {
           return <ProductListItem product={item} />;
         }}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item: Product) => item.id}
         ListEmptyComponent={() => <EmptyListComponent loading={loading} />}
         ItemSeparatorComponent={() => <View style={styles.separator} />}
       />
 
-      <FloatingButton
+      {/* <FloatingButton
         action={() => navigation.navigate("CreateShoppingList")}
-      />
+      /> */}
     </DefaultSafeAreaContainer>
   );
 }
