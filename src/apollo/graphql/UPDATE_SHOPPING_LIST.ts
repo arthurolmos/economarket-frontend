@@ -4,9 +4,8 @@ export const UPDATE_SHOPPING_LIST = gql`
   mutation UpdateShoppingList(
     $values: ShoppingListsUpdateInput!
     $id: String!
-    $userId: String!
   ) {
-    updateShoppingList(values: $values, userId: $userId, id: $id) {
+    updateShoppingList(values: $values, id: $id) {
       id
       name
     }
