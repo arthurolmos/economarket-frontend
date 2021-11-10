@@ -1,12 +1,13 @@
 import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import ProductsScreen from "../screens/ProductsScreen";
-import MyListsScreen from "../screens/ShoppingListsScreen";
-import HomeScreen from "../screens/HomeScreen";
+import ProductsScreen from "../screens/products/ProductsScreen";
+import MyListsScreen from "../screens/my-lists-screen/MyListsScreen";
+import HomeScreen from "../screens/home-screen/HomeScreen";
 import SettingsScreen from "../screens/SettingsScreen";
 import { TabNavigatorIcon } from "../components/icons/TabNavigatorIcon";
+import { RootTabParamList } from "../interfaces/navigation";
 
-const Tab = createBottomTabNavigator();
+const Tab = createBottomTabNavigator<RootTabParamList>();
 
 function TabNavigator() {
   return (
@@ -28,7 +29,7 @@ function TabNavigator() {
         }}
       />
       <Tab.Screen
-        name="Minhas Listas"
+        name="MyLists"
         component={MyListsScreen}
         options={{
           tabBarLabel: "Minhas Listas",
@@ -38,7 +39,7 @@ function TabNavigator() {
         }}
       />
       <Tab.Screen
-        name="Produtos"
+        name="Products"
         component={ProductsScreen}
         options={{
           tabBarLabel: "Produtos",
@@ -48,7 +49,7 @@ function TabNavigator() {
         }}
       />
       <Tab.Screen
-        name="Configuracões"
+        name="Settings"
         component={SettingsScreen}
         options={{
           tabBarLabel: "Configurações",

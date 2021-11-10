@@ -7,7 +7,6 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { AuthContext } from "../contexts/AuthContext";
-import DefaultScreenProp from "../interfaces/navigation/DefaultScreenProp";
 import { useMutation } from "@apollo/client";
 import { LOGIN } from "../apollo/graphql";
 import { showToast } from "../components/toast";
@@ -16,8 +15,9 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import DefaultButton from "../components/buttons/DefaultButton";
 import { validate } from "../lib/validations";
 import storage from "../storage";
+import { DefaultStackScreenProps } from "../interfaces/navigation";
 
-function LoginScreen({ navigation }: DefaultScreenProp) {
+function LoginScreen({ navigation }: DefaultStackScreenProps<"Login">) {
   const { signIn } = React.useContext(AuthContext);
 
   const [username, setUsername] = React.useState("");
@@ -41,7 +41,7 @@ function LoginScreen({ navigation }: DefaultScreenProp) {
       console.log({ user });
 
       signIn(token, user);
-    } catch (err) {
+    } catch (err: any) {
       console.log("Error on Login!", err);
       showToast("Erro ao logar!");
     }

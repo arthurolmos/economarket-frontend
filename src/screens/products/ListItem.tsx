@@ -4,36 +4,28 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  Button,
   Alert,
   ActivityIndicator,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { ShoppingList } from "../../interfaces/shoppingList";
 import { AuthContext } from "../../contexts/AuthContext";
 import { useMutation } from "@apollo/client";
-import {
-  DELETE_PRODUCT,
-  DELETE_SHOPPING_LIST,
-  GET_PRODUCTS_BY_USER,
-  GET_SHOPPING_LISTS_BY_USER,
-  LEAVE_SHARED_SHOPPING_LIST,
-} from "../../apollo/graphql";
-import { showToast } from "../toast";
+import { DELETE_PRODUCT, GET_PRODUCTS_BY_USER } from "../../apollo/graphql";
+import { showToast } from "../../components/toast";
 import { Product } from "../../interfaces/product";
 import { Ionicons } from "@expo/vector-icons";
-import ScreenNavigationProp from "../../interfaces/navigation/ScreenNavigationProp";
+import { DefaulScreenNavigationProp } from "../../interfaces/navigation";
 
 interface Props {
   product: Product;
 }
 
-export function ProductListItem(props: Props) {
+export function ListItem(props: Props) {
   const { user } = React.useContext(AuthContext);
 
   const { product } = props;
 
-  const navigation = useNavigation<ScreenNavigationProp>();
+  const navigation = useNavigation<DefaulScreenNavigationProp>();
 
   const [doDeleteProduct, { loading }] = useMutation(DELETE_PRODUCT, {
     refetchQueries: [
@@ -51,7 +43,7 @@ export function ProductListItem(props: Props) {
       });
 
       showToast("Produto excluído com sucesso!");
-    } catch (err) {
+    } catch (err: any) {
       console.log("Error on deleting product!", err);
       showToast(err.message);
     }

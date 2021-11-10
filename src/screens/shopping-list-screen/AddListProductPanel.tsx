@@ -17,7 +17,6 @@ import {
 } from "../../apollo/graphql";
 import { showToast } from "../../components/toast";
 import { DefaultInput } from "../../components/inputs";
-import ParamScreenProp from "../../interfaces/navigation/ParamScreenProp";
 import { ListHintProductListItem } from "../../components/list-items";
 import {
   ListProduct,
@@ -79,7 +78,7 @@ function AddListProductPanel(props: Props) {
 
       showToast("Produto inserido com sucesso!");
       clear();
-    } catch (err) {
+    } catch (err: any) {
       console.log("Error on adding Product!", err);
       showToast("Erro ao inserir Produto!");
     }

@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { AuthContext } from "../contexts/AuthContext";
-import DefaultScreenProp from "../interfaces/navigation/DefaultScreenProp";
+import { DefaultStackScreenProps } from "../interfaces/navigation";
 import { useMutation } from "@apollo/client";
 import { showToast } from "../components/toast";
 import { REGISTER } from "../apollo/graphql";
@@ -17,7 +17,7 @@ import { UserCreateInput } from "../interfaces/user";
 import DefaultButton from "../components/buttons/DefaultButton";
 import { validate } from "../lib/validations";
 
-function RegisterScreen({ navigation }: DefaultScreenProp) {
+function RegisterScreen({ navigation }: DefaultStackScreenProps<"Register">) {
   const { signIn } = React.useContext(AuthContext);
 
   const [firstName, setFirstName] = React.useState("");
@@ -45,7 +45,7 @@ function RegisterScreen({ navigation }: DefaultScreenProp) {
       const { token, user } = data.register;
 
       signIn(token, user);
-    } catch (err) {
+    } catch (err: any) {
       console.log("Error on Register!", err);
       showToast("Erro ao se registrar!");
     }

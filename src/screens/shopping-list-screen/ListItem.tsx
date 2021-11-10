@@ -1,10 +1,8 @@
-import { useMutation } from "@apollo/client";
-import { useNavigation } from "@react-navigation/native";
 import React from "react";
 import {
-  View,
-  Text,
   StyleSheet,
+  Text,
+  View,
   TouchableOpacity,
   ActivityIndicator,
 } from "react-native";
@@ -12,24 +10,26 @@ import {
   GET_SHOPPING_LIST,
   DELETE_LIST_PRODUCT,
   UPDATE_LIST_PRODUCT,
-  CREATE_PRODUCT,
 } from "../../apollo/graphql";
 import { ListProduct } from "../../interfaces/list-product";
-import { showToast } from "../toast";
+import { showToast } from "../../components/toast";
 import { Swipeable } from "react-native-gesture-handler";
 import { Product } from "../../interfaces/product";
-import ScreenNavigationProp from "../../interfaces/navigation/ScreenNavigationProp";
-import { DefaultIcon } from "../icons";
+import { DefaulScreenNavigationProp } from "../../interfaces/navigation";
+import { DefaultIcon } from "../../components/icons";
+import { useNavigation } from "@react-navigation/core";
+import { useMutation } from "@apollo/client";
 
 interface Props {
   product: ListProduct;
-  openModal: (product: Partial<Product>) => void;
+  openFavModal: (product: Partial<Product>) => void;
+  openCopyModal: (product: Partial<ListProduct>) => void;
 }
 
-export function ListProductListItem(props: Props) {
-  const { product, openModal } = props;
+export function ListItem(props: Props) {
+  const { product, openFavModal, openCopyModal } = props;
 
-  const navigation = useNavigation<ScreenNavigationProp>();
+  const navigation = useNavigation<DefaulScreenNavigationProp>();
 
   const swipeRef = React.useRef<Swipeable>(null);
 
@@ -51,7 +51,7 @@ export function ListProductListItem(props: Props) {
       });
 
       showToast("Produto removido com sucesso!");
-    } catch (err) {
+    } catch (err: any) {
       console.log("Error on removing product", err);
       showToast(err.message);
     }
@@ -78,7 +78,7 @@ export function ListProductListItem(props: Props) {
       } else {
         showToast("Produto retornado com sucesso!");
       }
-    } catch (err) {
+    } catch (err: any) {
       console.log("Error on purchasing product", err);
       showToast(err.message);
     }
@@ -146,13 +146,17 @@ export function ListProductListItem(props: Props) {
             : { backgroundColor: "white" },
         ]}
       >
-        <View style={{ display: "flex", flex: 1 }}>
+        <View style={{ display: "flex", flex: 2 }}>
           <Text style={styles.productName}>{product.name}</Text>
           <Text>R$ {product.price?.toFixed(2)}</Text>
           <Text>Qtd: {product.quantity}</Text>
           <Text>Total: R$ {totalPrice.toFixed(2)}</Text>
         </View>
         <View style={styles.buttonContainer}>
+          <TouchableOpacity onPress={() => openCopyModal(product)}>
+            <DefaultIcon name="copy" size={26} color="gray" />
+          </TouchableOpacity>
+
           <TouchableOpacity
             onPress={() =>
               navigation.navigate("EditListProduct", {
@@ -161,11 +165,11 @@ export function ListProductListItem(props: Props) {
               })
             }
           >
-            <DefaultIcon name="create" size={32} color="gray" />
+            <DefaultIcon name="create" size={26} color="gray" />
           </TouchableOpacity>
 
-          <TouchableOpacity onPress={() => openModal(product)}>
-            <DefaultIcon name="star" size={32} color="gray" />
+          <TouchableOpacity onPress={() => openFavModal(product)}>
+            <DefaultIcon name="star" size={26} color="gray" />
           </TouchableOpacity>
         </View>
       </View>
@@ -185,6 +189,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     textTransform: "uppercase",
   },
+
   leftActionPanel: {
     backgroundColor: "red",
     display: "flex",
@@ -207,8 +212,8 @@ const styles = StyleSheet.create({
   buttonContainer: {
     display: "flex",
     flexDirection: "row",
-    width: "30%",
     justifyContent: "space-between",
     alignItems: "center",
+    flex: 1,
   },
 });

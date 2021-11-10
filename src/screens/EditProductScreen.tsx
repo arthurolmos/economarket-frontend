@@ -10,31 +10,22 @@ import {
   UPDATE_PRODUCT,
 } from "../apollo/graphql";
 import { ListProductUpdateInput } from "../interfaces/list-product";
-import ParamScreenProp from "../interfaces/navigation/ParamScreenProp";
+import { DefaultStackScreenProps } from "../interfaces/navigation";
 import DefaultButton from "../components/buttons/DefaultButton";
 import { AuthContext } from "../contexts";
 
 function EditProductScreen({
   navigation,
   route,
-}: ParamScreenProp<"EditProduct">) {
+}: DefaultStackScreenProps<"EditProduct">) {
   const id = route.params.id;
 
   const { user } = React.useContext(AuthContext);
 
-  const { loading, data, startPolling, stopPolling, error } = useQuery(
-    GET_PRODUCT,
-    {
-      variables: { id },
-      fetchPolicy: "network-only",
-    }
-  );
-
-  // React.useEffect(() => {
-  //   startPolling(1000);
-
-  //   return () => stopPolling();
-  // }, []);
+  const { loading, data, error } = useQuery(GET_PRODUCT, {
+    variables: { id },
+    fetchPolicy: "network-only",
+  });
 
   const product = data?.product;
   if (error) console.log(error);
@@ -80,7 +71,7 @@ function EditProductScreen({
 
       showToast("Produto atualizado com sucesso!");
       navigation.goBack();
-    } catch (err) {
+    } catch (err: any) {
       console.log("Error on updating product!", err);
       showToast("Erro ao atualizar o produto!");
     }

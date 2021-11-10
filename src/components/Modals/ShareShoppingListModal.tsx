@@ -26,7 +26,7 @@ export function ShareShoppingListModal(props: Props) {
     try {
       if (!validate(email)) throw new Error("Preencha os dados corretamente!");
 
-      if (email === user.email) return;
+      if (email === user?.email) return;
 
       const input = {
         shoppingListId: shoppingList.id,
@@ -44,7 +44,7 @@ export function ShareShoppingListModal(props: Props) {
       showToast("Lista compartilhada com sucesso!");
 
       close();
-    } catch (err) {
+    } catch (err: any) {
       console.log("Error on sharing Shopping List!", err);
       showToast("Erro ao compartilhar a lista!");
     }

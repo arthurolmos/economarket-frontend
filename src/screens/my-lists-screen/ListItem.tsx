@@ -18,21 +18,21 @@ import {
   GET_SHOPPING_LISTS_BY_USER,
   LEAVE_SHARED_SHOPPING_LIST,
 } from "../../apollo/graphql";
-import { showToast } from "../toast";
-import ScreenNavigationProp from "../../interfaces/navigation/ScreenNavigationProp";
+import { showToast } from "../../components/toast";
+import { DefaulScreenNavigationProp } from "../../interfaces/navigation";
 import { Swipeable } from "react-native-gesture-handler";
-import { DefaultIcon } from "../icons";
+import { DefaultIcon } from "../../components/icons";
 
 interface Props {
   shoppingList: ShoppingList;
 }
 
-export function ShoppingListItem(props: Props) {
+export function ListItem(props: Props) {
   const { user } = React.useContext(AuthContext);
 
   const { shoppingList } = props;
 
-  const navigation = useNavigation<ScreenNavigationProp>();
+  const navigation = useNavigation<DefaulScreenNavigationProp>();
 
   const swipeRef = React.useRef<Swipeable>(null);
 
@@ -55,7 +55,7 @@ export function ShoppingListItem(props: Props) {
       });
 
       showToast("Saida com sucesso!");
-    } catch (err) {
+    } catch (err: any) {
       console.log("Error on leaing Shopping List", err);
       console.log(err.message);
     }
@@ -80,7 +80,7 @@ export function ShoppingListItem(props: Props) {
       });
 
       showToast("Lista excluída com sucesso!");
-    } catch (err) {
+    } catch (err: any) {
       console.log("Error on deleting Shopping List!", err);
     }
   }
@@ -104,7 +104,7 @@ export function ShoppingListItem(props: Props) {
       });
 
       showToast("Lista finalizada com sucesso!");
-    } catch (err) {
+    } catch (err: any) {
       console.log("Error on finishing Shopping List!", err);
     }
   }

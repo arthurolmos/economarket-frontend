@@ -7,9 +7,9 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:948983969808:android:9a5ecb9c1333a8f579b295",
+        "mobilesdk_app_id": "1:948983969808:android:691238e6d73bee6879b295",
         "android_client_info": {
-          "package_name": "com.arthurolmos.economarket"
+          "package_name": "com.arthurolmos.imarket"
         }
       },
       "oauth_client": [
@@ -20,7 +20,7 @@
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyBWEgS2kVblKVmwbR_jE4TGbJfgZKD7tb0"
+          "current_key": "AIzaSyB3zO0XTuu_5GU057jT4FVBDOpK2kAOV5M"
         }
       ],
       "services": {

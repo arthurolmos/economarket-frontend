@@ -2,17 +2,17 @@ import React from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { AuthContext } from "../contexts/AuthContext";
-import RootStackParamList from "../interfaces/navigation/RootStackParamList";
+import { RootStackParamList } from "../interfaces/navigation";
 import LoginScreen from "../screens/LoginScreen";
 import RegisterScreen from "../screens/RegisterScreen";
 import CreateShoppingListScreen from "../screens/CreateShoppingListScreen";
 import ShoppingListScreen from "../screens/shopping-list-screen/ShoppingListScreen";
 import EditListProductScreen from "../screens/EditListProductScreen";
 import { NotificationButton } from "../components/buttons";
-import NotificationsScreen from "../screens/NotificationsScreen";
+import NotificationsScreen from "../screens/notifications-screen/NotificationsScreen";
 import { navigationRef } from "./RootNavigation";
 import EditProductScreen from "../screens/EditProductScreen";
-import TabNavigatorScreen from "../screens/TabNavigatorScreen";
+import MainScreen from "../screens/MainScreen";
 
 const Stack = createStackNavigator<RootStackParamList>();
 
@@ -22,7 +22,7 @@ function StackNavigator() {
   return (
     <NavigationContainer ref={navigationRef}>
       <Stack.Navigator
-        initialRouteName="Home"
+        initialRouteName="Main"
         screenOptions={({ navigation }: any) => ({
           headerRight: () => (
             <NotificationButton
@@ -50,8 +50,8 @@ function StackNavigator() {
         ) : (
           <>
             <Stack.Screen
-              name="TabNavigator"
-              component={TabNavigatorScreen}
+              name="Main"
+              component={MainScreen}
               options={{ title: "iMarket" }}
             />
             <Stack.Screen

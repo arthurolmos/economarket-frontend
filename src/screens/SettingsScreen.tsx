@@ -1,11 +1,13 @@
 import React from "react";
 import { StyleSheet, Text, View, Button } from "react-native";
 import { AuthContext } from "../contexts/AuthContext";
-import DefaultScreenProp from "../interfaces/navigation/DefaultScreenProp";
+import { DefaultBottomTabScreenProps } from "../interfaces/navigation";
 
 interface Props {}
 
-function SettingsScreen({ navigation }: DefaultScreenProp) {
+function SettingsScreen({
+  navigation,
+}: DefaultBottomTabScreenProps<"Settings">) {
   const { signOut } = React.useContext(AuthContext);
 
   return (

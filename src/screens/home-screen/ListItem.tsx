@@ -14,13 +14,13 @@ import {
 } from "../../apollo/graphql";
 import { AuthContext } from "../../contexts";
 import { ShoppingList } from "../../interfaces/shoppingList";
-import { showToast } from "../toast";
+import { showToast } from "../../components/toast";
 
 interface Props {
   item: ShoppingList;
 }
 
-export function TotalListItem(props: Props) {
+export function ListItem(props: Props) {
   const { item } = props;
 
   const { user } = React.useContext(AuthContext);
@@ -57,7 +57,7 @@ export function TotalListItem(props: Props) {
       });
 
       showToast("Lista excluída com sucesso!");
-    } catch (err) {
+    } catch (err: any) {
       console.log("Error on deleting Shopping List!", err);
     }
   }
@@ -81,7 +81,7 @@ export function TotalListItem(props: Props) {
       });
 
       showToast("Lista reaberta com sucesso!");
-    } catch (err) {
+    } catch (err: any) {
       console.log("Error on restore Shopping List!", err);
     }
   }

@@ -1,13 +1,12 @@
 import React from "react";
 import { StyleSheet, View, FlatList, Text } from "react-native";
-import DefaultScreenProp from "../interfaces/navigation/DefaultScreenProp";
-import { ShoppingListsContext } from "../contexts";
-import { DefaultSafeAreaContainer } from "../components/layout/DefaultSafeAreaContainer";
-import { FloatingButton } from "../components/buttons";
-import { EmptyListComponent } from "../components/list-items";
-import { TotalListItem } from "../components/list-items/TotalListItem";
+import { DefaultBottomTabScreenProps } from "../../interfaces/navigation";
+import { ShoppingListsContext } from "../../contexts";
+import { DefaultSafeAreaContainer } from "../../components/layout/DefaultSafeAreaContainer";
+import { EmptyListComponent } from "../../components/list-items";
+import { ListItem } from "./ListItem";
 
-function HomeScreen({ navigation }: DefaultScreenProp) {
+function HomeScreen({ navigation }: DefaultBottomTabScreenProps<"Home">) {
   const { shoppingLists, loading, refetch } =
     React.useContext(ShoppingListsContext);
 
@@ -43,7 +42,7 @@ function HomeScreen({ navigation }: DefaultScreenProp) {
         onRefresh={refetch}
         data={shoppingLists}
         renderItem={({ item }) => {
-          return <TotalListItem item={item} />;
+          return <ListItem item={item} />;
         }}
         keyExtractor={(item) => item.id}
         ListEmptyComponent={() => <EmptyListComponent loading={loading} />}

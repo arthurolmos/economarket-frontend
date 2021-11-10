@@ -10,29 +10,20 @@ import {
   UPDATE_LIST_PRODUCT,
 } from "../apollo/graphql";
 import { ListProductUpdateInput } from "../interfaces/list-product";
-import ParamScreenProp from "../interfaces/navigation/ParamScreenProp";
+import { DefaultStackScreenProps } from "../interfaces/navigation";
 import DefaultButton from "../components/buttons/DefaultButton";
 
 function EditListProductScreen({
   navigation,
   route,
-}: ParamScreenProp<"EditListProduct">) {
+}: DefaultStackScreenProps<"EditListProduct">) {
   const id = route.params.id;
   const shoppingListId = route.params.shoppingListId;
 
-  const { loading, data, startPolling, stopPolling } = useQuery(
-    GET_LIST_PRODUCT_BY_SHOPPING_LIST,
-    {
-      variables: { id, shoppingListId },
-      fetchPolicy: "network-only",
-    }
-  );
-
-  // React.useEffect(() => {
-  //   startPolling(1000);
-
-  //   return () => stopPolling();
-  // }, []);
+  const { loading, data } = useQuery(GET_LIST_PRODUCT_BY_SHOPPING_LIST, {
+    variables: { id, shoppingListId },
+    fetchPolicy: "network-only",
+  });
 
   const product = data?.listProductByShoppingList;
 
@@ -84,7 +75,7 @@ function EditListProductScreen({
 
       showToast("Produto atualizado com sucesso!");
       navigation.goBack();
-    } catch (err) {
+    } catch (err: any) {
       console.log("Error on updating product!", err);
       showToast("Erro ao atualizar o produto!");
     }

@@ -1,9 +1,9 @@
 import React from "react";
 import { FloatingButton } from "../components/buttons";
-import DefaultScreenProp from "../interfaces/navigation/DefaultScreenProp";
+import { DefaultStackScreenProps } from "../interfaces/navigation";
 import TabNavigator from "../navigators/TabNavigator";
 
-function TabNavigatorScreen({ navigation }: DefaultScreenProp) {
+function MainScreen({ navigation }: DefaultStackScreenProps<"Main">) {
   return (
     <>
       <TabNavigator />
@@ -15,4 +15,4 @@ function TabNavigatorScreen({ navigation }: DefaultScreenProp) {
   );
 }
 
-export default TabNavigatorScreen;
+export default MainScreen;

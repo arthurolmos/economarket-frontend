@@ -9,8 +9,8 @@ import {
 import { AuthContext } from "../../contexts/AuthContext";
 import { useQuery } from "@apollo/client";
 import { GET_SHOPPING_LIST_BY_USER } from "../../apollo/graphql";
-import ParamScreenProp from "../../interfaces/navigation/ParamScreenProp";
-import { ListProductListItem } from "../../components/list-items";
+import { DefaultStackScreenProps } from "../../interfaces/navigation";
+import { ListItem } from "./ListItem";
 import { ShoppingList } from "../../interfaces/shoppingList";
 import { ListProduct } from "../../interfaces/list-product";
 import { DefaultSubtitle, DefaultTitle } from "../../components/texts";
@@ -21,11 +21,12 @@ import { CreateProductModal } from "../../components/modals/CreateProductModal";
 import { DefaultSafeAreaContainer } from "../../components/layout/DefaultSafeAreaContainer";
 import { DefaultIcon } from "../../components/icons";
 import AddListProductPanel from "./AddListProductPanel";
+import { CopyProductModal } from "../../components/modals/CopyProductModal";
 
 function ShoppingListScreen({
   route,
   navigation,
-}: ParamScreenProp<"ShoppingList">) {
+}: DefaultStackScreenProps<"ShoppingList">) {
   const { user } = React.useContext(AuthContext);
 
   const shoppingListId = route.params.id;
@@ -37,17 +38,32 @@ function ShoppingListScreen({
   const openShareModal = () => setShareModalVisible(true);
   const closeShareModal = () => setShareModalVisible(false);
 
-  const [modalProduct, setModalProduct] =
-    React.useState<Partial<Product> | null>(null);
-  const [addProductModalVisible, setFavProductModalVisible] =
+  const [favProduct, setFavProduct] = React.useState<Partial<Product> | null>(
+    null
+  );
+  const [favProductModalVisible, setFavProductModalVisible] =
     React.useState(false);
   const openFavProductModal = (product: Partial<Product>) => {
-    setModalProduct(product);
+    setFavProduct(product);
     setFavProductModalVisible(true);
   };
   const closeFavProductModal = () => {
-    setModalProduct(null);
+    setFavProduct(null);
     setFavProductModalVisible(false);
+  };
+
+  const [copyProduct, setCopyProduct] = React.useState<Partial<Product> | null>(
+    null
+  );
+  const [copyProductModalVisible, setCopyProductModalVisible] =
+    React.useState(false);
+  const openCopyProductModal = (product: Partial<Product>) => {
+    setCopyProduct(product);
+    setCopyProductModalVisible(true);
+  };
+  const closeCopyProductModal = () => {
+    setCopyProduct(null);
+    setCopyProductModalVisible(false);
   };
 
   const { startPolling, stopPolling, ...getShoppingListResult } = useQuery(
@@ -66,10 +82,6 @@ function ShoppingListScreen({
   const shoppingList: ShoppingList =
     getShoppingListResult.data?.shoppingListByUser;
   const username = `${shoppingList?.user?.firstName} ${shoppingList?.user?.lastName}`;
-  // const sharedWith =
-  //   shoppingList?.sharedUsers && shoppingList?.sharedUsers.length > 1
-  //     ? `Compartilhado com ${shoppingList?.sharedUsers?.length} pessoas`
-  //     : "";
   const purchasedListItemsTotal = shoppingList?.listProducts?.filter(
     (product) => product.purchased === true
   ).length;
@@ -133,9 +145,10 @@ function ShoppingListScreen({
           const product = { ...item };
 
           return (
-            <ListProductListItem
+            <ListItem
               product={product}
-              openModal={openFavProductModal}
+              openFavModal={openFavProductModal}
+              openCopyModal={openCopyProductModal}
             />
           );
         }}
@@ -156,9 +169,16 @@ function ShoppingListScreen({
       />
 
       <CreateProductModal
-        isOpen={addProductModalVisible}
+        isOpen={favProductModalVisible}
         close={closeFavProductModal}
-        product={modalProduct}
+        product={favProduct}
+      />
+
+      <CopyProductModal
+        isOpen={copyProductModalVisible}
+        close={closeCopyProductModal}
+        product={copyProduct}
+        shoppingListId={shoppingListId}
       />
     </DefaultSafeAreaContainer>
   );

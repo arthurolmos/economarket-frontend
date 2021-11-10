@@ -69,7 +69,7 @@ export function NotificationsProvider({ children }: Props) {
       });
 
       console.log("Token registered successfully", pushNotificationToken);
-    } catch (err) {
+    } catch (err: any) {
       console.log("Error creating notification token", err);
     }
   }
@@ -89,7 +89,7 @@ export function NotificationsProvider({ children }: Props) {
       });
 
       console.log("Token deleted successfully");
-    } catch (err) {
+    } catch (err: any) {
       console.log("Error deleting notification token", err);
     }
   }

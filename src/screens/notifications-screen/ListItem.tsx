@@ -1,22 +1,14 @@
 import React from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Button,
-  Alert,
-  ActivityIndicator,
-} from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { Text, View, TouchableOpacity, StyleSheet } from "react-native";
 import { Notification } from "../../interfaces/notification";
+import { useNavigation } from "@react-navigation/native";
 import { useMutation } from "@apollo/client";
 import {
   DELETE_NOTIFICATION,
   READ_NOTIFICATION,
   SHARE_SHOPPING_LIST,
 } from "../../apollo/graphql";
-import { showToast } from "../toast";
+import { showToast } from "../../components/toast";
 
 interface Props {
   notification: Notification;
@@ -42,7 +34,7 @@ const NotificationActionButton = (props: NotificationActionButtonProps) => {
   );
 };
 
-export function NotificationListItem(props: Props) {
+export function ListItem(props: Props) {
   const { notification } = props;
 
   const navigation = useNavigation();
@@ -53,7 +45,7 @@ export function NotificationListItem(props: Props) {
     try {
       await shareShoppingList({
         variables: {
-          sharedUserId: notification.user.id,
+          userId: notification.user.id,
           id: notification.shoppingListId,
         },
       });
@@ -65,7 +57,7 @@ export function NotificationListItem(props: Props) {
       });
 
       showToast("Sucesso!");
-    } catch (err) {
+    } catch (err: any) {
       console.log("Error sharing Shopping List", err);
     }
   }
@@ -80,7 +72,7 @@ export function NotificationListItem(props: Props) {
       });
 
       showToast("Sucesso!");
-    } catch (err) {
+    } catch (err: any) {
       console.log("Error sharing Shopping List", err);
     }
   }

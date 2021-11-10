@@ -7,7 +7,7 @@ import {
   StyleSheet,
 } from "react-native";
 import { AuthContext } from "../contexts/AuthContext";
-import DefaultScreenProp from "../interfaces/navigation/DefaultScreenProp";
+import { DefaultStackScreenProps } from "../interfaces/navigation";
 import { useMutation } from "@apollo/client";
 import {
   CREATE_SHOPPING_LIST,
@@ -23,14 +23,43 @@ import {
 import { validate } from "../lib/validations";
 import { SaveButton } from "../components/buttons";
 import { DefaultSafeAreaContainer } from "../components/layout/DefaultSafeAreaContainer";
-import Checkbox from "expo-checkbox";
 import { ShoppingListsContext } from "../contexts";
-import {
-  CreateShoppingListListItem,
-  EmptyListComponent,
-} from "../components/list-items";
+import { EmptyListComponent } from "../components/list-items";
+import Checkbox from "expo-checkbox";
 
-function CreateShoppingListScreen({ navigation }: DefaultScreenProp) {
+interface Props {
+  item: ShoppingList;
+  cb: (id: string, action: string) => void;
+}
+
+export function ListItem(props: Props) {
+  const { item, cb } = props;
+
+  const [selected, setSelected] = React.useState(false);
+
+  React.useEffect(() => {
+    if (selected) {
+      cb(item.id, "add");
+    } else {
+      cb(item.id, "delete");
+    }
+  }, [selected]);
+
+  return (
+    <View style={styles.wrapper}>
+      <Checkbox
+        value={selected}
+        onValueChange={setSelected}
+        style={{ marginRight: 10 }}
+      />
+      <Text>{item.name}</Text>
+    </View>
+  );
+}
+
+function CreateShoppingListScreen({
+  navigation,
+}: DefaultStackScreenProps<"CreateShoppingList">) {
   const { user } = React.useContext(AuthContext);
   const { shoppingLists, loading } = React.useContext(ShoppingListsContext);
 
@@ -125,7 +154,7 @@ function CreateShoppingListScreen({ navigation }: DefaultScreenProp) {
 
       showToast("Criado com sucesso!");
       navigation.goBack();
-    } catch (err) {
+    } catch (err: any) {
       console.log("Error on creating Shopping List", err);
       showToast(err.message);
     }
@@ -202,10 +231,7 @@ function CreateShoppingListScreen({ navigation }: DefaultScreenProp) {
           <FlatList
             data={activeTab === 0 ? openShoppingLists : shoppingLists}
             renderItem={({ item }) => (
-              <CreateShoppingListListItem
-                cb={addOrRemoveFromSelected}
-                item={item}
-              />
+              <ListItem cb={addOrRemoveFromSelected} item={item} />
             )}
             keyExtractor={(item: ShoppingList) => item.id}
             ListEmptyComponent={() => <EmptyListComponent loading={loading} />}
@@ -281,5 +307,12 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     padding: 10,
+  },
+
+  wrapper: {
+    display: "flex",
+    flexDirection: "row",
+    padding: 5,
+    alignItems: "center",
   },
 });
