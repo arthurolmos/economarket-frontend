@@ -12,9 +12,9 @@ import {
   GET_SHOPPING_LISTS_BY_USER,
   RESTORE_SHOPPING_LIST,
 } from "../../apollo/graphql";
-import { AuthContext } from "../../contexts";
 import { ShoppingList } from "../../interfaces/shoppingList";
 import { showToast } from "../../components/toast";
+import { useAuthContext } from "../../contexts";
 
 interface Props {
   item: ShoppingList;

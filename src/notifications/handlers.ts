@@ -17,9 +17,9 @@ const _handleNotification = (notification: any) => {
 const _handleNotificationResponse = (response: any) => {
   const { notification } = response;
 
-  RootNavigation.navigate("TabNavigator", {
-    screen: "Minhas Listas",
-  });
+  // RootNavigation.navigate("TabNavigator", {
+  //   screen: "Minhas Listas",
+  // });
 };
 
 export function addNotificationListeners() {

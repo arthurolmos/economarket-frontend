@@ -1,6 +1,9 @@
 import React from "react";
 import { View, Platform, StyleSheet, TouchableOpacity } from "react-native";
-import DateTimePicker, { Event } from "@react-native-community/datetimepicker";
+import DateTimePicker, {
+  DateTimePickerEvent,
+  Event,
+} from "@react-native-community/datetimepicker";
 import { DefaultInput } from "./DefaultInput";
 import { DefaultIcon } from "../icons";
 
@@ -24,7 +27,10 @@ export function DefaultDatePicker(props: Props) {
     pad(date.getFullYear()),
   ].join("/");
 
-  const onChange = (event: Event, selectedDate: Date | undefined) => {
+  const onChange = (
+    event: DateTimePickerEvent,
+    selectedDate: Date | undefined
+  ) => {
     const currentDate = selectedDate || date;
     setShow(Platform.OS === "ios");
     cb(currentDate);

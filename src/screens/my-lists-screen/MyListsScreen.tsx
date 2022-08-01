@@ -3,9 +3,9 @@ import { StyleSheet, View, FlatList } from "react-native";
 import { DefaultBottomTabScreenProps } from "../../interfaces/navigation";
 import { ListItem } from "../../components/list-items";
 import { EmptyListComponent } from "../../components/list-items";
-import { ShoppingListsContext } from "../../contexts";
 import { DefaultSafeAreaContainer } from "../../components/layout/DefaultSafeAreaContainer";
 import { ShoppingList } from "../../interfaces/shoppingList";
+import { useShoppingListsContext } from "../../contexts";
 
 function MyListsScreen({ navigation }: DefaultBottomTabScreenProps<"MyLists">) {
   const { shoppingLists, loading, refetch } = useShoppingListsContext();

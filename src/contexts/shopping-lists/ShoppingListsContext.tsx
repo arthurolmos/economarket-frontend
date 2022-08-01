@@ -9,4 +9,5 @@ interface IContext {
 
 export const ShoppingListsContext = React.createContext({} as IContext);
 
-export const useShoppingListsContext = React.useContext(ShoppingListsContext);
+export const useShoppingListsContext = () =>
+  React.useContext(ShoppingListsContext);

@@ -1,10 +1,10 @@
 import React from "react";
 import { StyleSheet, View, FlatList, Text } from "react-native";
 import { DefaultBottomTabScreenProps } from "../../interfaces/navigation";
-import { ShoppingListsContext } from "../../contexts";
 import { DefaultSafeAreaContainer } from "../../components/layout/DefaultSafeAreaContainer";
 import { EmptyListComponent } from "../../components/list-items";
 import { ListItem } from "./ListItem";
+import { useShoppingListsContext } from "../../contexts";
 
 function HomeScreen({ navigation }: DefaultBottomTabScreenProps<"Home">) {
   const { shoppingLists, loading, refetch } = useShoppingListsContext();

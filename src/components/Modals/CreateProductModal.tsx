@@ -1,7 +1,7 @@
 import { useMutation } from "@apollo/client";
 import React from "react";
 import { CREATE_PRODUCT } from "../../apollo/graphql";
-import { AuthContext } from "../../contexts";
+import { useAuthContext } from "../../contexts";
 import { Product } from "../../interfaces/product";
 import { DefaultInput } from "../inputs";
 import { showToast } from "../toast";

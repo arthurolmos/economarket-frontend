@@ -22,7 +22,11 @@ import {
 import { validate } from "../lib/validations";
 import { SaveButton } from "../components/buttons";
 import { DefaultSafeAreaContainer } from "../components/layout/DefaultSafeAreaContainer";
-import { ShoppingListsContext, useAuthContext } from "../contexts";
+import {
+  ShoppingListsContext,
+  useAuthContext,
+  useShoppingListsContext,
+} from "../contexts";
 import { EmptyListComponent } from "../components/list-items";
 import Checkbox from "expo-checkbox";
 

@@ -1,7 +1,7 @@
 import React from "react";
 import { Text, TouchableOpacity, StyleSheet, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { NotificationsContext } from "../../contexts";
+import { useNotificationsContext } from "../../contexts";
 import { Notification } from "../../interfaces/notification";
 
 interface Props {

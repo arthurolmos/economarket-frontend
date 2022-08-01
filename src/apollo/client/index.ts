@@ -6,22 +6,19 @@ import { getMainDefinition } from "@apollo/client/utilities";
 import { setContext } from "@apollo/client/link/context";
 import storage from "../../storage";
 
+const devUri = (Constants.default.manifest?.debuggerHost || "")
+  .split(":")
+  ?.shift()
+  ?.concat(`:3000/graphql`);
+
 const httpURI =
   process.env.NODE_ENV == "development"
-    ? "http://" +
-      Constants.default.manifest?.debuggerHost
-        .split(`:`)
-        .shift()
-        .concat(`:3000/graphql`)
+    ? "http://" + devUri
     : "https://economarket.herokuapp.com/graphql";
 
 const wsURI =
   process.env.NODE_ENV == "development"
-    ? "ws://" +
-      Constants.default.manifest?.debuggerHost
-        .split(`:`)
-        .shift()
-        .concat(`:3000/graphql`)
+    ? "ws://" + devUri
     : // .concat(`:3000/subscriptions`);
       "ws://economarket.herokuapp.com/graphql";
 

@@ -1,7 +1,7 @@
 import { useMutation } from "@apollo/client";
 import React from "react";
 import { CREATE_NOTIFICATION } from "../../apollo/graphql";
-import { AuthContext } from "../../contexts";
+import { useAuthContext } from "../../contexts";
 import { ShoppingList } from "../../interfaces/shoppingList";
 import { validate } from "../../lib/validations";
 import { DefaultInput } from "../inputs";

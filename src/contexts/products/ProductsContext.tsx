@@ -9,4 +9,4 @@ interface IContext {
 
 export const ProductsContext = React.createContext({} as IContext);
 
-export const useProductsContext = React.useContext(ProductsContext);
+export const useProductsContext = () => React.useContext(ProductsContext);

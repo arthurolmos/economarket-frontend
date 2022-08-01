@@ -12,7 +12,7 @@ import {
 import { ListProductUpdateInput } from "../interfaces/list-product";
 import { DefaultStackScreenProps } from "../interfaces/navigation";
 import DefaultButton from "../components/buttons/DefaultButton";
-import { AuthContext } from "../contexts";
+import { useAuthContext } from "../contexts";
 
 function EditProductScreen({
   navigation,

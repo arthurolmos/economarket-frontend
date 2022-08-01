@@ -2,10 +2,10 @@ import React from "react";
 import { StyleSheet, View, FlatList } from "react-native";
 import { DefaultBottomTabScreenProps } from "../../interfaces/navigation";
 import { EmptyListComponent } from "../../components/list-items";
-import { ProductsContext } from "../../contexts";
 import { DefaultSafeAreaContainer } from "../../components/layout/DefaultSafeAreaContainer";
 import { Product } from "../../interfaces/product";
 import { ListItem } from "./ListItem";
+import { useProductsContext } from "../../contexts";
 
 function ProductsScreen({
   navigation,
