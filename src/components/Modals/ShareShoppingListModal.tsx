@@ -17,7 +17,7 @@ interface Props {
 export function ShareShoppingListModal(props: Props) {
   const { isOpen, close, shoppingList } = props;
 
-  const { user } = React.useContext(AuthContext);
+  const { user } = useAuthContext();
 
   const [email, setEmail] = React.useState("");
 

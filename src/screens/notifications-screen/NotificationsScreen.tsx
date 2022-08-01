@@ -1,17 +1,16 @@
 import React from "react";
 import { StyleSheet, View, FlatList } from "react-native";
 import { DefaultStackScreenProps } from "../../interfaces/navigation";
-import { NotificationsContext } from "../../contexts/NotificationsContext";
 import { EmptyListComponent } from "../../components/list-items";
 import { DefaultSafeAreaContainer } from "../../components/layout/DefaultSafeAreaContainer";
 import { Notification } from "../../interfaces/notification";
 import { ListItem } from "./ListItem";
+import { useNotificationsContext } from "../../contexts";
 
 function NotificationsScreen({
   navigation,
 }: DefaultStackScreenProps<"Notifications">) {
-  const { notifications, loading, refetch } =
-    React.useContext(NotificationsContext);
+  const { notifications, loading, refetch } = useNotificationsContext();
 
   return (
     <DefaultSafeAreaContainer>

@@ -1,7 +1,6 @@
 import React from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
-import { AuthContext } from "../contexts/AuthContext";
 import { RootStackParamList } from "../interfaces/navigation";
 import LoginScreen from "../screens/LoginScreen";
 import RegisterScreen from "../screens/RegisterScreen";
@@ -13,11 +12,12 @@ import NotificationsScreen from "../screens/notifications-screen/NotificationsSc
 import { navigationRef } from "./RootNavigation";
 import EditProductScreen from "../screens/EditProductScreen";
 import MainScreen from "../screens/MainScreen";
+import { useAuthContext } from "../contexts";
 
 const Stack = createStackNavigator<RootStackParamList>();
 
 function StackNavigator() {
-  const { user } = React.useContext(AuthContext);
+  const { user } = useAuthContext();
 
   return (
     <NavigationContainer ref={navigationRef}>

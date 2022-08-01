@@ -8,8 +8,7 @@ import { DefaultSafeAreaContainer } from "../../components/layout/DefaultSafeAre
 import { ShoppingList } from "../../interfaces/shoppingList";
 
 function MyListsScreen({ navigation }: DefaultBottomTabScreenProps<"MyLists">) {
-  const { shoppingLists, loading, refetch } =
-    React.useContext(ShoppingListsContext);
+  const { shoppingLists, loading, refetch } = useShoppingListsContext();
 
   const openShoppingLists = shoppingLists.filter(
     (shoppingList: ShoppingList) => !shoppingList.done

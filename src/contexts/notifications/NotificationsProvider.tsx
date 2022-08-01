@@ -1,29 +1,21 @@
 import { useMutation, useQuery } from "@apollo/client";
 import React from "react";
-import { AuthContext } from "./AuthContext";
 import {
   CREATE_PUSH_NOTIFICATION_TOKEN,
   DELETE_PUSH_NOTIFICATION_TOKEN,
   GET_NOTIFICATIONS_BY_USER,
-} from "../apollo/graphql";
-import { Notification } from "../interfaces/notification";
-import "../notifications/register";
-import { addNotificationListeners, getToken } from "../notifications";
+} from "../../apollo/graphql";
+import "../../notifications/register";
+import { addNotificationListeners, getToken } from "../../notifications";
+import { useAuthContext } from "../auth";
+import { NotificationsContext } from "./NotificationsContext";
 
 interface Props {
   children: React.ReactElement[] | React.ReactElement;
 }
 
-interface IContext {
-  notifications: Notification[];
-  loading: boolean;
-  refetch: () => void;
-}
-
-export const NotificationsContext = React.createContext({} as IContext);
-
 export function NotificationsProvider({ children }: Props) {
-  const { user } = React.useContext(AuthContext);
+  const { user } = useAuthContext();
 
   const { data, loading, refetch, startPolling, stopPolling } = useQuery(
     GET_NOTIFICATIONS_BY_USER,

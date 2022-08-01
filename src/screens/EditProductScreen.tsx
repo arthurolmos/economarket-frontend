@@ -20,7 +20,7 @@ function EditProductScreen({
 }: DefaultStackScreenProps<"EditProduct">) {
   const id = route.params.id;
 
-  const { user } = React.useContext(AuthContext);
+  const { user } = useAuthContext();
 
   const { loading, data, error } = useQuery(GET_PRODUCT, {
     variables: { id },

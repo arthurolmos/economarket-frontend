@@ -9,7 +9,6 @@ import {
   TextInput,
   Keyboard,
 } from "react-native";
-import { AuthContext } from "../../contexts/AuthContext";
 import { useMutation } from "@apollo/client";
 import {
   CREATE_LIST_PRODUCT,
@@ -26,13 +25,14 @@ import { Product } from "../../interfaces/product";
 import { validate } from "../../lib/validations";
 import { client } from "../../apollo/client";
 import { DefaultIcon } from "../../components/icons";
+import { useAuthContext } from "../../contexts";
 
 interface Props {
   shoppingListId: string;
 }
 
 function AddListProductPanel(props: Props) {
-  const { user } = React.useContext(AuthContext);
+  const { user } = useAuthContext();
 
   const { shoppingListId } = props;
 

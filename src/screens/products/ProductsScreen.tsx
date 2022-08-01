@@ -10,7 +10,7 @@ import { ListItem } from "./ListItem";
 function ProductsScreen({
   navigation,
 }: DefaultBottomTabScreenProps<"Products">) {
-  const { products, refetch, loading } = React.useContext(ProductsContext);
+  const { products, refetch, loading } = useProductsContext();
 
   return (
     <DefaultSafeAreaContainer>

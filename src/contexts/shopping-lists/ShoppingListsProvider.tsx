@@ -1,23 +1,15 @@
 import React from "react";
-import { AuthContext } from "./AuthContext";
 import { useQuery } from "@apollo/client";
-import { GET_SHOPPING_LISTS_BY_USER } from "../apollo/graphql";
-import { ShoppingList } from "../interfaces/shoppingList";
+import { GET_SHOPPING_LISTS_BY_USER } from "../../apollo/graphql";
+import { useAuthContext } from "../auth";
+import { ShoppingListsContext } from "./ShoppingListsContext";
 
 interface Props {
   children: React.ReactElement[] | React.ReactElement;
 }
 
-interface IContext {
-  shoppingLists: ShoppingList[];
-  refetch: () => void;
-  loading: boolean;
-}
-
-export const ShoppingListsContext = React.createContext({} as IContext);
-
 export function ShoppingListsProvider({ children }: Props) {
-  const { user } = React.useContext(AuthContext);
+  const { user } = useAuthContext();
 
   const { loading, data, refetch, startPolling, stopPolling, error } = useQuery(
     GET_SHOPPING_LISTS_BY_USER,

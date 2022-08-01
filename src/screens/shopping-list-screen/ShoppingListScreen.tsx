@@ -6,7 +6,6 @@ import {
   FlatList,
   TouchableOpacity,
 } from "react-native";
-import { AuthContext } from "../../contexts/AuthContext";
 import { useQuery } from "@apollo/client";
 import { GET_SHOPPING_LIST_BY_USER } from "../../apollo/graphql";
 import { DefaultStackScreenProps } from "../../interfaces/navigation";
@@ -22,12 +21,13 @@ import { DefaultSafeAreaContainer } from "../../components/layout/DefaultSafeAre
 import { DefaultIcon } from "../../components/icons";
 import AddListProductPanel from "./AddListProductPanel";
 import { CopyProductModal } from "../../components/modals/CopyProductModal";
+import { useAuthContext } from "../../contexts";
 
 function ShoppingListScreen({
   route,
   navigation,
 }: DefaultStackScreenProps<"ShoppingList">) {
-  const { user } = React.useContext(AuthContext);
+  const { user } = useAuthContext();
 
   const shoppingListId = route.params.id;
 

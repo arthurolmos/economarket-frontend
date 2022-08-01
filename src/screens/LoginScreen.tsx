@@ -6,7 +6,6 @@ import {
   ActivityIndicator,
   TouchableOpacity,
 } from "react-native";
-import { AuthContext } from "../contexts/AuthContext";
 import { useMutation } from "@apollo/client";
 import { LOGIN } from "../apollo/graphql";
 import { showToast } from "../components/toast";
@@ -16,9 +15,10 @@ import DefaultButton from "../components/buttons/DefaultButton";
 import { validate } from "../lib/validations";
 import storage from "../storage";
 import { DefaultStackScreenProps } from "../interfaces/navigation";
+import { useAuthContext } from "../contexts";
 
 function LoginScreen({ navigation }: DefaultStackScreenProps<"Login">) {
-  const { signIn } = React.useContext(AuthContext);
+  const { signIn } = useAuthContext();
 
   const [username, setUsername] = React.useState("");
   const [password, setPassword] = React.useState("");

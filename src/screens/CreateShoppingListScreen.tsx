@@ -6,7 +6,6 @@ import {
   View,
   StyleSheet,
 } from "react-native";
-import { AuthContext } from "../contexts/AuthContext";
 import { DefaultStackScreenProps } from "../interfaces/navigation";
 import { useMutation } from "@apollo/client";
 import {
@@ -23,7 +22,7 @@ import {
 import { validate } from "../lib/validations";
 import { SaveButton } from "../components/buttons";
 import { DefaultSafeAreaContainer } from "../components/layout/DefaultSafeAreaContainer";
-import { ShoppingListsContext } from "../contexts";
+import { ShoppingListsContext, useAuthContext } from "../contexts";
 import { EmptyListComponent } from "../components/list-items";
 import Checkbox from "expo-checkbox";
 
@@ -60,8 +59,8 @@ export function ListItem(props: Props) {
 function CreateShoppingListScreen({
   navigation,
 }: DefaultStackScreenProps<"CreateShoppingList">) {
-  const { user } = React.useContext(AuthContext);
-  const { shoppingLists, loading } = React.useContext(ShoppingListsContext);
+  const { user } = useAuthContext();
+  const { shoppingLists, loading } = useShoppingListsContext();
 
   const openShoppingLists = shoppingLists?.filter(
     (shoppingList) => !shoppingList.done

@@ -7,8 +7,7 @@ import { EmptyListComponent } from "../../components/list-items";
 import { ListItem } from "./ListItem";
 
 function HomeScreen({ navigation }: DefaultBottomTabScreenProps<"Home">) {
-  const { shoppingLists, loading, refetch } =
-    React.useContext(ShoppingListsContext);
+  const { shoppingLists, loading, refetch } = useShoppingListsContext();
 
   const getTotalByMonth = (month: number, year: number) => {
     const total = shoppingLists.reduce((accumulator, currentValue) => {

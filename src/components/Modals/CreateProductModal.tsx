@@ -14,7 +14,7 @@ interface Props {
 }
 
 export function CreateProductModal(props: Props) {
-  const { user } = React.useContext(AuthContext);
+  const { user } = useAuthContext();
 
   const { isOpen, close, product } = props;
 

@@ -23,7 +23,7 @@ interface Props {
 export function ListItem(props: Props) {
   const { item } = props;
 
-  const { user } = React.useContext(AuthContext);
+  const { user } = useAuthContext();
 
   const [consider, setConsider] = React.useState(true);
   const toggle = () => setConsider(!consider);

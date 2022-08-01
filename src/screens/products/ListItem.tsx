@@ -8,20 +8,20 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { AuthContext } from "../../contexts/AuthContext";
 import { useMutation } from "@apollo/client";
 import { DELETE_PRODUCT, GET_PRODUCTS_BY_USER } from "../../apollo/graphql";
 import { showToast } from "../../components/toast";
 import { Product } from "../../interfaces/product";
 import { Ionicons } from "@expo/vector-icons";
 import { DefaulScreenNavigationProp } from "../../interfaces/navigation";
+import { useAuthContext } from "../../contexts";
 
 interface Props {
   product: Product;
 }
 
 export function ListItem(props: Props) {
-  const { user } = React.useContext(AuthContext);
+  const { user } = useAuthContext();
 
   const { product } = props;
 

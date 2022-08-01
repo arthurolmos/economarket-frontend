@@ -1,6 +1,6 @@
 import React from "react";
 import { StyleSheet, Text, View, Button } from "react-native";
-import { AuthContext } from "../contexts/AuthContext";
+import { useAuthContext } from "../contexts";
 import { DefaultBottomTabScreenProps } from "../interfaces/navigation";
 
 interface Props {}
@@ -8,7 +8,7 @@ interface Props {}
 function SettingsScreen({
   navigation,
 }: DefaultBottomTabScreenProps<"Settings">) {
-  const { signOut } = React.useContext(AuthContext);
+  const { signOut } = useAuthContext();
 
   return (
     <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>

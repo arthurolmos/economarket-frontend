@@ -6,7 +6,6 @@ import {
   ActivityIndicator,
   TouchableOpacity,
 } from "react-native";
-import { AuthContext } from "../contexts/AuthContext";
 import { DefaultStackScreenProps } from "../interfaces/navigation";
 import { useMutation } from "@apollo/client";
 import { showToast } from "../components/toast";
@@ -16,9 +15,10 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { UserCreateInput } from "../interfaces/user";
 import DefaultButton from "../components/buttons/DefaultButton";
 import { validate } from "../lib/validations";
+import { useAuthContext } from "../contexts";
 
 function RegisterScreen({ navigation }: DefaultStackScreenProps<"Register">) {
-  const { signIn } = React.useContext(AuthContext);
+  const { signIn } = useAuthContext();
 
   const [firstName, setFirstName] = React.useState("");
   const [lastName, setLastName] = React.useState("");

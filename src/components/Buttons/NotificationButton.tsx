@@ -11,7 +11,7 @@ interface Props {
 export function NotificationButton(props: Props) {
   const { action } = props;
 
-  const { notifications } = React.useContext(NotificationsContext);
+  const { notifications } = useNotificationsContext();
 
   const notificationsUnread = notifications
     ? notifications.filter((notification: Notification) => !!!notification.read)

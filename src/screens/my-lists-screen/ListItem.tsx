@@ -10,7 +10,6 @@ import {
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { ShoppingList } from "../../interfaces/shoppingList";
-import { AuthContext } from "../../contexts/AuthContext";
 import { useMutation } from "@apollo/client";
 import {
   DELETE_SHOPPING_LIST,
@@ -22,13 +21,14 @@ import { showToast } from "../../components/toast";
 import { DefaulScreenNavigationProp } from "../../interfaces/navigation";
 import { Swipeable } from "react-native-gesture-handler";
 import { DefaultIcon } from "../../components/icons";
+import { useAuthContext } from "../../contexts";
 
 interface Props {
   shoppingList: ShoppingList;
 }
 
 export function ListItem(props: Props) {
-  const { user } = React.useContext(AuthContext);
+  const { user } = useAuthContext();
 
   const { shoppingList } = props;
 
