@@ -35,6 +35,13 @@ interface Props {
   cb: (id: string, action: string) => void;
 }
 
+enum OptionsEnum {
+  USE_PENDING_PRODUCTS = "usePendingProducts",
+  USE_SHOPPING_LISTS = "useShoppingLists",
+}
+
+type Options = Record<OptionsEnum, boolean>;
+
 export function ListItem(props: Props) {
   const { item, cb } = props;
 
@@ -72,9 +79,39 @@ function CreateShoppingListScreen({
 
   const [name, setName] = React.useState("");
   const [date, setDate] = React.useState(new Date());
+  const [options, setOptions] = React.useState<Options>({
+    usePendingProducts: false,
+    useShoppingLists: false,
+  });
 
-  const [usePendingProducts, setUsePendingProducts] = React.useState(false);
-  const [useShoppingLists, setUseShoppingLists] = React.useState(false);
+  const handleSelect = (option: OptionsEnum) => {
+    console.log({ option });
+    const isSelected = options[option];
+
+    if (
+      option === OptionsEnum.USE_PENDING_PRODUCTS &&
+      options.useShoppingLists === true &&
+      isSelected === false
+    ) {
+      return setOptions({
+        usePendingProducts: true,
+        useShoppingLists: false,
+      });
+    }
+
+    if (
+      option === OptionsEnum.USE_SHOPPING_LISTS &&
+      options.usePendingProducts === true &&
+      isSelected === false
+    ) {
+      return setOptions({
+        usePendingProducts: false,
+        useShoppingLists: true,
+      });
+    }
+
+    return setOptions((prevState) => ({ ...prevState, [option]: !isSelected }));
+  };
 
   const [activeTab, setActiveTab] = React.useState(0);
   const switchTab = (activeTab: number) => setActiveTab(activeTab);
@@ -132,7 +169,7 @@ function CreateShoppingListScreen({
 
       if (!validate(data)) throw new Error("Preencha os campos corretamente!");
 
-      if (usePendingProducts) {
+      if (options.usePendingProducts) {
         await createShoppingListFromPendingProducts({
           variables: {
             userId: user?.id,
@@ -141,7 +178,7 @@ function CreateShoppingListScreen({
             data,
           },
         });
-      } else if (useShoppingLists) {
+      } else if (options.useShoppingLists) {
         await createShoppingListFromShoppingLists({
           variables: {
             userId: user?.id,
@@ -163,10 +200,6 @@ function CreateShoppingListScreen({
     }
   }
 
-  React.useEffect(() => {
-    if (usePendingProducts && useShoppingLists) setUseShoppingLists(false);
-  }, [usePendingProducts, useShoppingLists]);
-
   return (
     <DefaultSafeAreaContainer loading={loadingCreation}>
       <DefaultInput value={name} onChangeText={setName} placeholder="Nome" />
@@ -178,8 +211,8 @@ function CreateShoppingListScreen({
           style={{
             marginRight: 5,
           }}
-          value={usePendingProducts}
-          onValueChange={setUsePendingProducts}
+          value={options.usePendingProducts}
+          onValueChange={() => handleSelect(OptionsEnum.USE_PENDING_PRODUCTS)}
         />
 
         <Text
@@ -196,8 +229,8 @@ function CreateShoppingListScreen({
           style={{
             marginRight: 5,
           }}
-          value={useShoppingLists}
-          onValueChange={setUseShoppingLists}
+          value={options.useShoppingLists}
+          onValueChange={() => handleSelect(OptionsEnum.USE_SHOPPING_LISTS)}
         />
 
         <Text
@@ -209,7 +242,7 @@ function CreateShoppingListScreen({
         </Text>
       </View>
 
-      {(usePendingProducts || useShoppingLists) && (
+      {(options.usePendingProducts || options.useShoppingLists) && (
         <View style={{ marginTop: 15 }}>
           <View style={styles.tabContainer}>
             <TouchableOpacity
@@ -243,7 +276,7 @@ function CreateShoppingListScreen({
               height: 300,
             }}
           />
-          {usePendingProducts && (
+          {options.usePendingProducts && (
             <View style={styles.checkboxWrapper}>
               <Checkbox
                 style={{
