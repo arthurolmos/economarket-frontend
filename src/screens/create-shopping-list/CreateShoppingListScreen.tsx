@@ -6,34 +6,27 @@ import {
   View,
   StyleSheet,
 } from "react-native";
-import { DefaultStackScreenProps } from "../interfaces/navigation";
+import { DefaultStackScreenProps } from "../../interfaces/navigation";
 import { useMutation } from "@apollo/client";
 import {
   CREATE_SHOPPING_LIST,
   CREATE_SHOPPING_LIST_FROM_PENDING_PRODUCTS,
   CREATE_SHOPPING_LIST_FROM_SHOPPING_LISTS,
-} from "../apollo/graphql";
-import { showToast } from "../components/toast";
-import { DefaultDatePicker, DefaultInput } from "../components/inputs";
+} from "../../apollo/graphql";
+import { showToast } from "../../components/toast";
+import { DefaultDatePicker, DefaultInput } from "../../components/inputs";
 import {
   ShoppingList,
   ShoppingListCreateInput,
-} from "../interfaces/shoppingList";
-import { validate } from "../lib/validations";
-import { SaveButton } from "../components/buttons";
-import { DefaultSafeAreaContainer } from "../components/layout/DefaultSafeAreaContainer";
-import {
-  ShoppingListsContext,
-  useAuthContext,
-  useShoppingListsContext,
-} from "../contexts";
-import { EmptyListComponent } from "../components/list-items";
-import Checkbox from "expo-checkbox";
+} from "../../interfaces/shoppingList";
+import { validate } from "../../lib/validations";
+import { SaveButton } from "../../components/buttons";
+import { DefaultSafeAreaContainer } from "../../components/layout/DefaultSafeAreaContainer";
+import { useAuthContext, useShoppingListsContext } from "../../contexts";
+import { EmptyListComponent } from "../../components/list-items";
+import { ListItem } from "./components";
 
-interface Props {
-  item: ShoppingList;
-  cb: (id: string, action: string) => void;
-}
+import Checkbox from "expo-checkbox";
 
 enum OptionsEnum {
   USE_PENDING_PRODUCTS = "usePendingProducts",
@@ -41,31 +34,6 @@ enum OptionsEnum {
 }
 
 type Options = Record<OptionsEnum, boolean>;
-
-export function ListItem(props: Props) {
-  const { item, cb } = props;
-
-  const [selected, setSelected] = React.useState(false);
-
-  React.useEffect(() => {
-    if (selected) {
-      cb(item.id, "add");
-    } else {
-      cb(item.id, "delete");
-    }
-  }, [selected]);
-
-  return (
-    <View style={styles.wrapper}>
-      <Checkbox
-        value={selected}
-        onValueChange={setSelected}
-        style={{ marginRight: 10 }}
-      />
-      <Text>{item.name}</Text>
-    </View>
-  );
-}
 
 function CreateShoppingListScreen({
   navigation,
@@ -85,7 +53,6 @@ function CreateShoppingListScreen({
   });
 
   const handleSelect = (option: OptionsEnum) => {
-    console.log({ option });
     const isSelected = options[option];
 
     if (
@@ -343,12 +310,5 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     padding: 10,
-  },
-
-  wrapper: {
-    display: "flex",
-    flexDirection: "row",
-    padding: 5,
-    alignItems: "center",
   },
 });

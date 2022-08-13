@@ -4,7 +4,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import { RootStackParamList } from "../interfaces/navigation";
 import LoginScreen from "../screens/LoginScreen";
 import RegisterScreen from "../screens/RegisterScreen";
-import CreateShoppingListScreen from "../screens/CreateShoppingListScreen";
+import CreateShoppingListScreen from "../screens/create-shopping-list/CreateShoppingListScreen";
 import ShoppingListScreen from "../screens/shopping-list-screen/ShoppingListScreen";
 import EditListProductScreen from "../screens/EditListProductScreen";
 import { NotificationButton } from "../components/buttons";
