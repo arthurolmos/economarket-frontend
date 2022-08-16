@@ -16,11 +16,13 @@ export enum OptionsEnum {
 export type Options = Record<OptionsEnum, boolean>;
 
 interface Props {
-  data: ShoppingListCreateInput;
+  data: {
+    values: ShoppingListCreateInput;
+    options: Options;
+    selectedListsIds: string[];
+    removeProductsFromSelectedLists: boolean;
+  };
   user: User;
-  options: Options;
-  selectedListsIds: string[];
-  removeProductsFromSelectedLists: boolean;
 }
 
 const [createShoppingList, creatingShoppingList] = useMutation(
@@ -49,29 +51,24 @@ export const loadingCreation =
   creatingShoppingListFromShoppingLists.loading ||
   creatingShoppingList.loading;
 
-export async function useSubmit({
-  data,
-  user,
-  selectedListsIds,
-  removeProductsFromSelectedLists,
-  options,
-}: Props) {
-  if (!validate(data)) throw new Error("Preencha os campos corretamente!");
+export async function useSubmit({ data, user }: Props) {
+  if (!validate(data.values))
+    throw new Error("Preencha os campos corretamente!");
 
-  if (options.usePendingProducts) {
+  if (data.options.usePendingProducts) {
     await createShoppingListFromPendingProducts({
       variables: {
         userId: user?.id,
-        ids: selectedListsIds,
-        remove: removeProductsFromSelectedLists,
+        ids: data.selectedListsIds,
+        remove: data.removeProductsFromSelectedLists,
         data,
       },
     });
-  } else if (options.useShoppingLists) {
+  } else if (data.options.useShoppingLists) {
     await createShoppingListFromShoppingLists({
       variables: {
         userId: user?.id,
-        ids: selectedListsIds,
+        ids: data.selectedListsIds,
         data,
       },
     });

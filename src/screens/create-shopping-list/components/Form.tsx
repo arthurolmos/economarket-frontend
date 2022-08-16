@@ -29,69 +29,33 @@ export default function Form() {
   const [activeTab, setActiveTab] = React.useState(0);
   const switchTab = (activeTab: number) => setActiveTab(activeTab);
 
-  const [options, setOptions] = React.useState<Options>({
-    usePendingProducts: false,
-    useShoppingLists: false,
-  });
-  const handleSelect = (option: OptionsEnum) => {
-    const isSelected = options[option];
-
-    if (
-      option === OptionsEnum.USE_PENDING_PRODUCTS &&
-      options.useShoppingLists === true &&
-      isSelected === false
-    ) {
-      return setOptions({
-        usePendingProducts: true,
-        useShoppingLists: false,
-      });
-    }
-
-    if (
-      option === OptionsEnum.USE_SHOPPING_LISTS &&
-      options.usePendingProducts === true &&
-      isSelected === false
-    ) {
-      return setOptions({
-        usePendingProducts: false,
-        useShoppingLists: true,
-      });
-    }
-
-    return setOptions((prevState) => ({ ...prevState, [option]: !isSelected }));
-  };
-
-  const [selectedListsIds, setSelectedListsIds] = React.useState<string[]>([]);
-  const addOrRemoveFromSelected = (id: string, action: string) => {
-    const selected = new Set([...selectedListsIds]);
-
-    if (action === "add") {
-      selected.add(id);
-    } else {
-      selected.delete(id);
-    }
-
-    setSelectedListsIds([...selected]);
-  };
-
-  const [removeProductsFromSelectedLists, setRemoveProductsFromSelectedLists] =
-    React.useState(false);
-
   return (
     <Formik
-      initialValues={{ name: "", date: new Date() }}
+      initialValues={{
+        name: "",
+        date: new Date(),
+        options: {
+          usePendingProducts: false,
+          useShoppingLists: false,
+        },
+        selectedListsIds: new Array<string>(),
+        removeProductsFromSelectedLists: false,
+      }}
       onSubmit={(values) => {
         try {
           useSubmit({
             data: {
-              date: values.date,
-              name: values.name,
-              done: false,
+              values: {
+                date: values.date,
+                name: values.name,
+                done: false,
+              },
+              options: values.options,
+              selectedListsIds: values.selectedListsIds,
+              removeProductsFromSelectedLists:
+                values.removeProductsFromSelectedLists,
             },
             user: user!,
-            options,
-            selectedListsIds,
-            removeProductsFromSelectedLists,
           });
 
           showToast("Criado com sucesso!");
@@ -102,120 +66,173 @@ export default function Form() {
         }
       }}
     >
-      {({ handleChange, handleSubmit, setFieldValue, values }) => (
-        <>
-          <DefaultInput
-            value={values.name}
-            onChangeText={handleChange("values")}
-            placeholder="Nome"
-          />
+      {({ handleChange, handleSubmit, setFieldValue, values }) => {
+        const handleSelect = (option: OptionsEnum) => {
+          const isSelected = values.options[option];
+          let selection = {
+            ...values.options,
+            [option]: !isSelected,
+          };
 
-          <DefaultDatePicker
-            cb={(date: Date) => setFieldValue("date", date)}
-            date={values.date}
-          />
+          if (
+            option === OptionsEnum.USE_PENDING_PRODUCTS &&
+            values.options.useShoppingLists === true &&
+            isSelected === false
+          ) {
+            selection = {
+              usePendingProducts: true,
+              useShoppingLists: false,
+            };
+          }
 
-          <View style={styles.checkboxWrapper}>
-            <Checkbox
-              style={{
-                marginRight: 5,
-              }}
-              value={options.usePendingProducts}
-              onValueChange={() =>
-                handleSelect(OptionsEnum.USE_PENDING_PRODUCTS)
-              }
+          if (
+            option === OptionsEnum.USE_SHOPPING_LISTS &&
+            values.options.usePendingProducts === true &&
+            isSelected === false
+          ) {
+            selection = {
+              usePendingProducts: false,
+              useShoppingLists: true,
+            };
+          }
+
+          return setFieldValue("options", selection);
+        };
+
+        const addOrRemoveFromSelected = (id: string, action: string) => {
+          const selected = new Set([...values.selectedListsIds]);
+
+          if (action === "add") {
+            selected.add(id);
+          } else {
+            selected.delete(id);
+          }
+
+          setFieldValue("selectedListsIds", [...selected]);
+        };
+
+        return (
+          <>
+            <DefaultInput
+              value={values.name}
+              onChangeText={handleChange("values")}
+              placeholder="Nome"
             />
 
-            <Text
-              style={{
-                display: "flex",
-              }}
-            >
-              Inserir produtos pendentes?
-            </Text>
-          </View>
-
-          <View style={styles.checkboxWrapper}>
-            <Checkbox
-              style={{
-                marginRight: 5,
-              }}
-              value={options.useShoppingLists}
-              onValueChange={() => handleSelect(OptionsEnum.USE_SHOPPING_LISTS)}
+            <DefaultDatePicker
+              cb={(date: Date) => setFieldValue("date", date)}
+              date={values.date}
             />
 
-            <Text
-              style={{
-                display: "flex",
-              }}
-            >
-              Criar a partir de outras listas?
-            </Text>
-          </View>
-
-          {(options.usePendingProducts || options.useShoppingLists) && (
-            <View style={{ marginTop: 15 }}>
-              <View style={styles.tabContainer}>
-                <TouchableOpacity
-                  style={[
-                    styles.tab,
-                    { backgroundColor: activeTab === 0 ? "red" : "blue" },
-                  ]}
-                  onPress={() => switchTab(0)}
-                >
-                  <Text>Listas Abertas</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[
-                    styles.tab,
-                    { backgroundColor: activeTab === 1 ? "red" : "blue" },
-                  ]}
-                  onPress={() => switchTab(1)}
-                >
-                  <Text>Todas as Listas</Text>
-                </TouchableOpacity>
-              </View>
-              <FlatList
-                data={activeTab === 0 ? openShoppingLists : shoppingLists}
-                renderItem={({ item }) => (
-                  <ListItem cb={addOrRemoveFromSelected} item={item} />
-                )}
-                keyExtractor={(item: ShoppingList) => item.id}
-                ListEmptyComponent={() => (
-                  <EmptyListComponent loading={loading} />
-                )}
-                ItemSeparatorComponent={() => <View style={styles.separator} />}
+            <View style={styles.checkboxWrapper}>
+              <Checkbox
                 style={{
-                  height: 300,
+                  marginRight: 5,
                 }}
+                value={values.options.usePendingProducts}
+                onValueChange={() =>
+                  handleSelect(OptionsEnum.USE_PENDING_PRODUCTS)
+                }
               />
-              {options.usePendingProducts && (
-                <View style={styles.checkboxWrapper}>
-                  <Checkbox
-                    style={{
-                      marginRight: 5,
-                    }}
-                    value={removeProductsFromSelectedLists}
-                    onValueChange={setRemoveProductsFromSelectedLists}
-                  />
 
-                  <Text
-                    style={{
-                      display: "flex",
-                    }}
-                  >
-                    Remover produtos pendentes das listas originais?
-                  </Text>
-                </View>
-              )}
+              <Text
+                style={{
+                  display: "flex",
+                }}
+              >
+                Inserir produtos pendentes?
+              </Text>
             </View>
-          )}
 
-          <View style={styles.buttonWrapper}>
-            <SaveButton action={handleSubmit} />
-          </View>
-        </>
-      )}
+            <View style={styles.checkboxWrapper}>
+              <Checkbox
+                style={{
+                  marginRight: 5,
+                }}
+                value={values.options.useShoppingLists}
+                onValueChange={() =>
+                  handleSelect(OptionsEnum.USE_SHOPPING_LISTS)
+                }
+              />
+
+              <Text
+                style={{
+                  display: "flex",
+                }}
+              >
+                Criar a partir de outras listas?
+              </Text>
+            </View>
+
+            {(values.options.usePendingProducts ||
+              values.options.useShoppingLists) && (
+              <View style={{ marginTop: 15 }}>
+                <View style={styles.tabContainer}>
+                  <TouchableOpacity
+                    style={[
+                      styles.tab,
+                      { backgroundColor: activeTab === 0 ? "red" : "blue" },
+                    ]}
+                    onPress={() => switchTab(0)}
+                  >
+                    <Text>Listas Abertas</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[
+                      styles.tab,
+                      { backgroundColor: activeTab === 1 ? "red" : "blue" },
+                    ]}
+                    onPress={() => switchTab(1)}
+                  >
+                    <Text>Todas as Listas</Text>
+                  </TouchableOpacity>
+                </View>
+                <FlatList
+                  data={activeTab === 0 ? openShoppingLists : shoppingLists}
+                  renderItem={({ item }) => (
+                    <ListItem cb={addOrRemoveFromSelected} item={item} />
+                  )}
+                  keyExtractor={(item: ShoppingList) => item.id}
+                  ListEmptyComponent={() => (
+                    <EmptyListComponent loading={loading} />
+                  )}
+                  ItemSeparatorComponent={() => (
+                    <View style={styles.separator} />
+                  )}
+                  style={{
+                    height: 300,
+                  }}
+                />
+                {values.options.usePendingProducts && (
+                  <View style={styles.checkboxWrapper}>
+                    <Checkbox
+                      style={{
+                        marginRight: 5,
+                      }}
+                      value={values.removeProductsFromSelectedLists}
+                      onValueChange={(value: boolean) =>
+                        setFieldValue("removeProductsFromSelectedLists", value)
+                      }
+                    />
+
+                    <Text
+                      style={{
+                        display: "flex",
+                      }}
+                    >
+                      Remover produtos pendentes das listas originais?
+                    </Text>
+                  </View>
+                )}
+              </View>
+            )}
+
+            <View style={styles.buttonWrapper}>
+              <SaveButton action={handleSubmit} />
+            </View>
+          </>
+        );
+      }}
     </Formik>
   );
 }
